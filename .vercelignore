@@ -3,3 +3,7 @@ CLAUDE.md
 serve.mjs
 screenshot.mjs
 .env*
+tailwind.config.js
+src
+node_modules
+tools

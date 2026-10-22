@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Privacy policy | Simple LinkedIn Rewriter</title>
+<meta name="description" content="What Simple LinkedIn Rewriter does with your drafts, cookies and usage data.">
+<link rel="canonical" href="https://simplelinkedinrewriter.vercel.app/privacy.html">
+<meta name="theme-color" content="#091B33">
+<link rel="icon" href="brand_assets/logo-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Outfit:wght@500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/site.css">
+<link rel="stylesheet" href="assets/legal.css">
+<script>
+  window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
+  if (!/^(localhost|127\.0\.0\.1)$/.test(location.hostname)) {
+    const s = document.createElement('script'); s.defer = true; s.src = '/_vercel/insights/script.js';
+    document.head.appendChild(s);
+  }
+</script>
+</head>
+<body>
+
+<header class="legal-head">
+  <nav class="wrap relative z-10 flex h-[80px] items-center justify-between" aria-label="Main">
+    <a href="./" class="focusable rounded-md transition-opacity duration-200 hover:opacity-90 active:opacity-75" aria-label="Simple LinkedIn Rewriter home">
+      <img src="brand_assets/logo-transparent.png" alt="Simple LinkedIn Rewriter" class="h-10 w-auto md:h-12">
+    </a>
+    <a href="./#demo" class="btn">Try it free</a>
+  </nav>
+  <div class="wrap relative z-10 pb-[64px] pt-[48px] lg:pb-[96px] lg:pt-[64px]">
+    <a href="./" class="backlink">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg>
+      Back to the rewriter
+    </a>
+    <h1 class="mt-6 text-[40px] sm:text-[56px]">Privacy policy</h1>
+    <p class="mt-4 text-[16px] text-mist">Last updated 22 October 2026</p>
+  </div>
+</header>
+
+<main class="wrap py-[64px] lg:py-[96px]">
+  <article class="prose">
+    <div class="summary">
+      <p><strong>The short version:</strong> we don't keep your drafts. To rewrite a post we send it to an AI provider and pass the result straight back to you. To enforce the free daily limit we keep a random visitor ID, your IP address and a count of your rewrites for up to 48 hours. We don't sell data, show ads, or ask for your LinkedIn login.</p>
+    </div>
+
+    <h2>Who runs this site</h2>
+    <p>Simple LinkedIn Rewriter is an independent project and is not affiliated with LinkedIn. For any privacy question or request, email <a href="mailto:xiarui091@gmail.com">xiarui091@gmail.com</a>.</p>
+
+    <h2>What we process and why</h2>
+
+    <h3>The drafts you rewrite</h3>
+    <p>When you press Rewrite, your draft and the tone you picked are sent to our server and on to an AI provider, which writes the new version. We don't save drafts or rewrites in a database or in our logs.</p>
+    <p>We use two providers:</p>
+    <ul>
+      <li><strong>Groq</strong> handles rewrites first. It processes your text under the <a href="https://groq.com/privacy-policy/" rel="noopener">Groq privacy policy</a>.</li>
+      <li><strong>Google Gemini API</strong> is used only if Groq is unavailable. We use Gemini's free tier, and under <a href="https://ai.google.dev/gemini-api/terms" rel="noopener">Google's terms</a> content sent to free-tier services may be used to improve Google's products and may be read by human reviewers.</li>
+    </ul>
+    <p>Because of this, <strong>don't paste confidential information</strong>, or personal details about other people that they haven't agreed to share.</p>
+
+    <h3>Counting free rewrites</h3>
+    <p>Free visitors get 5 rewrites a day. To count them we use:</p>
+    <ul>
+      <li>a cookie called <code>slr_vid</code> holding a random ID, kept for up to a year so we can recognise your browser;</li>
+      <li>your IP address, so clearing cookies doesn't reset the limit for everyone on a network.</li>
+    </ul>
+    <p>Each day's counts are stored in our database (Upstash Redis) against that ID and IP address, and are deleted automatically after 48 hours. If the database is unavailable we count in a signed cookie called <code>slr_use</code> instead, which expires after 2 days.</p>
+    <p>When someone enters an invite code, we also count attempts per IP address for one hour to stop people guessing codes.</p>
+
+    <h3>Invited access</h3>
+    <p>If you enter a valid invite code, your browser tab keeps a signed pass in session storage. It's deleted when you close the tab, and expires after 12 hours either way. You can also end it anytime with "Switch to free plan".</p>
+
+    <h3>Hosting, fonts and analytics</h3>
+    <ul>
+      <li><strong>Vercel</strong> hosts the site. Like any web host it processes technical request data, such as your IP address and browser type, to deliver pages. See the <a href="https://vercel.com/legal/privacy-policy" rel="noopener">Vercel privacy policy</a>.</li>
+      <li><strong>Vercel Web Analytics</strong> counts page views. It doesn't use cookies and gives us totals, not a record of individual people.</li>
+      <li><strong>Google Fonts</strong> serves the typefaces, so your browser requests them from Google, which receives your IP address.</li>
+    </ul>
+
+    <h2>What we don't do</h2>
+    <ul>
+      <li>We don't sell or rent data, and we don't use advertising or tracking cookies.</li>
+      <li>We don't ask for your LinkedIn login and never post on your behalf.</li>
+      <li>We don't need your name or email to use the free plan or an invite code.</li>
+    </ul>
+
+    <h2>Why we're allowed to process it</h2>
+    <p>Rewriting your draft is the service you ask for when you press Rewrite. Counting usage, limiting invite attempts and keeping basic hosting logs are needed to run the free plan fairly and keep the site secure, which is our legitimate interest.</p>
+
+    <h2>Your choices and rights</h2>
+    <ul>
+      <li>You can clear this site's cookies and session storage in your browser settings at any time.</li>
+      <li>Depending on where you live, you may have rights to access, correct, delete or object to processing of your personal data, and to complain to your data protection authority. Email us and we'll help. Since we keep only a random ID, an IP address and short-lived counts, there is usually very little to find.</li>
+    </ul>
+
+    <h2>Children</h2>
+    <p>This site isn't meant for anyone under 16.</p>
+
+    <h2>Changes to this policy</h2>
+    <p>We'll update this page when we change what we collect, for example when Pro accounts and payments launch, and change the date at the top.</p>
+  </article>
+</main>
+
+<footer class="border-t border-white/5 bg-navy">
+  <div class="wrap flex flex-col items-start justify-between gap-6 py-10 md:flex-row md:items-center">
+    <img src="brand_assets/logo-transparent.png" alt="Simple LinkedIn Rewriter" class="h-8 w-auto">
+    <nav class="flex flex-wrap gap-x-8 gap-y-3" aria-label="Footer">
+      <a class="footlink" href="./#how">How it works</a>
+      <a class="footlink" href="./#pricing">Pricing</a>
+      <a class="footlink" href="./#faq">FAQ</a>
+      <a class="footlink" href="privacy.html" aria-current="page">Privacy</a>
+      <a class="footlink" href="terms.html">Terms</a>
+    </nav>
+    <p class="text-[13px] text-mist/70">© 2026 Simple LinkedIn Rewriter. Not affiliated with LinkedIn.</p>
+  </div>
+</footer>
+
+</body>
+</html>

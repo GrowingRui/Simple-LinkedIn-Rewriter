@@ -32,7 +32,7 @@ Rules:
 - Reframe negative, blunt or self-critical statements (for example "I am lazy") into honest, constructive language a professional audience would respect, such as describing a struggle with motivation. Keep the real meaning; don't turn it into a success story.
 - Expand on the draft where it helps: add relevant context, professional insight or a takeaway that supports the author's point, written from a professional perspective. If the draft is only a sentence or two, develop it into a post of 2 to 4 short paragraphs.
 - Preserve the author's original meaning and intent. Keep every fact, name, number and opinion from the draft.
-- Added material must be general insight, not new facts about the author: never invent names, numbers, employers, dates, results or events, and never claim the author did, plans or tried something the draft does not say.
+- Added material must be general insight, not new facts about the author: never invent names, numbers, employers, dates, results or events, and never claim the author did, plans or tried something the draft does not say. That includes how long something took, how hard it was, how the author prepared or trained, who helped or supported them, and how they feel, unless the draft says so.
 - No questions anywhere in the post: every sentence is a statement, and no sentence ends with a question mark. Rephrase any question from the draft as a statement. End on a clear statement, takeaway or call to action instead of asking readers something.
 - Cut clichés and filler: "humbled and honored", "thrilled to share", "let that sink in", "game-changer", "in today's fast-paced world", "couldn't have done it without you", "incredible journey", "next chapter", engagement bait.
 - Short paragraphs of 1 to 3 sentences, separated by one blank line. Never write the whole post as a single block.
@@ -115,7 +115,10 @@ export default async function handler(req, res) {
   if (text.length > MAX_CHARS) return res.status(400).json({ error: `Drafts can be up to ${MAX_CHARS.toLocaleString('en-US')} characters.` });
   if (!TONES[tone]) return res.status(400).json({ error: 'Pick a tone.' });
 
-  const available = PROVIDERS.filter(p => p.key());
+  // AI_PROVIDERS (e.g. "gemini" or "gemini,groq") picks which providers run, in order.
+  const order = (process.env.AI_PROVIDERS || '').split(',').map(s => s.trim()).filter(Boolean);
+  const chosen = order.length ? order.map(n => PROVIDERS.find(p => p.name === n)).filter(Boolean) : PROVIDERS;
+  const available = chosen.filter(p => p.key());
   if (!available.length) {
     console.error('No AI provider keys set (GROQ_API_KEY / GEMINI_API_KEY).');
     return res.status(503).json({ error: 'Rewriting is not set up yet. Try again later.' });

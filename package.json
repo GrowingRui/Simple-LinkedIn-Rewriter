@@ -3,9 +3,13 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "node serve.mjs"
+    "dev": "node serve.mjs",
+    "build:css": "tailwindcss -i src/tailwind.css -o assets/site.css --minify"
   },
   "engines": {
     "node": ">=20"
+  },
+  "devDependencies": {
+    "tailwindcss": "3.4.17"
   }
 }

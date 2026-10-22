@@ -1,0 +1,57 @@
+<!doctype html>
+<!-- Source for assets/og-image.png (1200x630). Render: node screenshot.mjs http://localhost:3000/tools/og-image.html og 1200 630 -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Outfit:wght@600;700&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; margin: 0; }
+  body { width: 1200px; height: 630px; overflow: hidden; font-family: Inter, sans-serif; color: #fff;
+    background:
+      radial-gradient(60% 70% at 92% 8%, rgba(26,115,232,.38), transparent 70%),
+      radial-gradient(45% 60% at 5% 100%, rgba(16,185,129,.22), transparent 70%),
+      #091B33; position: relative; }
+  body::after { content: ""; position: absolute; inset: 0; opacity: .08; mix-blend-mode: overlay;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 .9 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"); }
+  .left { position: absolute; left: 72px; top: 64px; width: 520px; }
+  .logo { height: 56px; }
+  h1 { font-family: Outfit, sans-serif; font-weight: 700; font-size: 66px; line-height: 1.02; letter-spacing: -0.03em; margin-top: 64px; }
+  .sub { margin-top: 28px; font-size: 22px; line-height: 1.5; color: #A9B8D0; }
+  .cards { position: absolute; right: 64px; top: 104px; width: 500px; }
+  .card { border-radius: 18px; padding: 22px 26px; font-size: 17px; line-height: 1.55; }
+  .before { background: rgba(255,255,255,.05); border: 1.5px dashed rgba(255,255,255,.2); color: rgba(255,255,255,.55); }
+  .before s { text-decoration-color: #10B981; text-decoration-thickness: 2px; }
+  .after { margin-top: 26px; margin-left: 36px; background: #fff; color: #18263C;
+    box-shadow: 0 2px 4px rgba(3,10,22,.25), 0 24px 48px -16px rgba(3,10,22,.6), 0 48px 96px -32px rgba(26,115,232,.35), 0 0 0 1px rgba(16,185,129,.35); }
+  .label { font-size: 13px; font-weight: 600; margin-bottom: 8px; }
+  .before .label { color: rgba(255,255,255,.5); }
+  .after .label { color: #10B981; }
+  .tag { color: #1A73E8; font-weight: 500; }
+  .arrow { position: absolute; left: 604px; top: 300px; }
+</style>
+</head>
+<body>
+  <div class="left">
+    <img class="logo" src="../brand_assets/logo-transparent.png" alt="">
+    <h1>Write LinkedIn posts people finish reading.</h1>
+    <p class="sub">Paste a rough draft. Get a clear post back in seconds. 5 free rewrites a day.</p>
+  </div>
+  <div class="cards">
+    <div class="card before">
+      <p class="label">Your draft</p>
+      <p><s>I am extremely humbled and honored to announce</s> that I have accepted a new position as Senior Product Designer at Northwind Health!! Thank you to everyone who supported me <s>on this incredible journey</s> <s>#Blessed #Grateful #Motivation</s></p>
+    </div>
+    <div class="card after">
+      <p class="label">Rewritten</p>
+      <p>I've joined Northwind Health as Senior Product Designer.</p>
+      <p style="margin-top:10px">Thank you to everyone who supported me along the way.</p>
+      <p style="margin-top:10px" class="tag">#ProductDesign</p>
+    </div>
+  </div>
+  <svg class="arrow" width="70" height="80" viewBox="0 0 48 56" fill="none" aria-hidden="true">
+    <defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#1A73E8"/><stop offset="1" stop-color="#10B981"/></linearGradient></defs>
+    <path d="M10 6 C 2 24, 8 40, 28 46" stroke="url(#g)" stroke-width="4" stroke-linecap="round"/>
+    <path d="M22 38 L32 47 L20 52" stroke="#10B981" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+  </svg>
+</body>
+</html>
