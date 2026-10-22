@@ -32,7 +32,8 @@ Rules:
 - Reframe negative, blunt or self-critical statements (for example "I am lazy") into honest, constructive language a professional audience would respect, such as describing a struggle with motivation. Keep the real meaning; don't turn it into a success story.
 - Expand on the draft where it helps: add relevant context, professional insight or a takeaway that supports the author's point, written from a professional perspective. If the draft is only a sentence or two, develop it into a post of 2 to 4 short paragraphs.
 - Preserve the author's original meaning and intent. Keep every fact, name, number and opinion from the draft.
-- Added material must be general insight, not new facts about the author: never invent names, numbers, employers, dates, results or events, and never claim the author did, plans or tried something the draft does not say. That includes how long something took, how hard it was, how the author prepared or trained, who helped or supported them, and how they feel, unless the draft says so.
+- Sentences about the author (using I, me, my or a verb with no subject, like "Finished my first marathon") may only state what the draft states. Never invent names, numbers, employers, dates, results or events.
+- Every sentence you add beyond the draft must be about the topic in general, not about the author: write "Marathons reward patient, steady training", never "after months of training". Do not mention the author's preparation, effort, study, training, duration, difficulty, helpers, supporters, gratitude or feelings unless the draft mentions them.
 - No questions anywhere in the post: every sentence is a statement, and no sentence ends with a question mark. Rephrase any question from the draft as a statement. End on a clear statement, takeaway or call to action instead of asking readers something.
 - Cut clichés and filler: "humbled and honored", "thrilled to share", "let that sink in", "game-changer", "in today's fast-paced world", "couldn't have done it without you", "incredible journey", "next chapter", engagement bait.
 - Short paragraphs of 1 to 3 sentences, separated by one blank line. Never write the whole post as a single block.
@@ -43,7 +44,7 @@ Rules:
 - Output only the rewritten post, nothing before or after it.`;
 
 const TONES = {
-  professional: 'Tone: professional. Clear, confident and warm. Lead with what happened, then why it matters, then a professional insight or takeaway, and a brief thank-you if the draft has one. Write the insight as a general observation ("What helps is...", "Teams that..."), never as steps the author took unless the draft says so.',
+  professional: 'Tone: professional. Clear, confident and warm. Lead with what happened, then why it matters, then a professional insight or takeaway, and a brief thank-you only if the draft has one. Write the insight as a general observation ("What helps is...", "Teams that..."), never as steps the author took unless the draft says so.',
   concise: 'Tone: concise. The shortest polished version that keeps the key facts: under 40 words before the hashtags, in 1 or 2 short paragraphs. Drop generic thank-yous and sign-offs unless they name someone. For a one-line draft, concise still means a professional rewrite, not a copy.',
   story: 'Tone: storytelling. Open with a concrete moment or detail that is in the draft, then build to the main point and close with the lesson it holds. Use only events from the draft; if it has no story to tell, keep the narrative light rather than inventing one. Never describe steps, habits or changes the author made unless the draft says so; give advice as general insight, not as something the author did.',
 };
@@ -69,7 +70,7 @@ async function callProvider(p, text, tone, retry) {
     headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${p.key()}` },
     body: JSON.stringify({
       model: p.model(),
-      temperature: retry ? 0.8 : 0.6,
+      temperature: retry ? 0.7 : 0.4,
       messages: [
         { role: 'system', content: `${RULES}\n\n${TONES[tone]}${retry ? `\n\n${RETRY_NOTES[retry]}` : ''}` },
         { role: 'user', content: `<draft>\n${text}\n</draft>` },
