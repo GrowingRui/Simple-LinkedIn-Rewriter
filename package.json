@@ -1,0 +1,11 @@
+{
+  "name": "simple-linkedin-rewriter",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "node serve.mjs"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
