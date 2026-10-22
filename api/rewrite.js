@@ -99,6 +99,17 @@ function clean(s) {
     .replace(/([.!])[ \t]+((?:#[\p{L}\p{N}_]+[ \t]*)+)$/u, '$1\n\n$2');
 }
 
+// If the model ignored the paragraph rule and wrote one long block, break it into 2-sentence paragraphs.
+function paragraphs(s) {
+  const [, body, tags = ''] = s.match(/^([\s\S]*?)(\n*(?:#[\p{L}\p{N}_]+[ \t]*)+)?$/u);
+  if (/\n/.test(body.trim())) return s;
+  const sentences = body.trim().split(/(?<=[.!])(?<!\b(?:e\.g|i\.e|etc|vs|Mr|Mrs|Ms|Dr|Jr|Sr|St|Inc|Ltd|U\.S)\.)\s+(?=\p{Lu})/u);
+  if (sentences.length < 4) return s;
+  const out = [];
+  for (let i = 0; i < sentences.length; i += 2) out.push(sentences.slice(i, i + 2).join(' '));
+  return out.join('\n\n') + (tags.trim() ? `\n\n${tags.trim()}` : '');
+}
+
 // True when the model handed the draft back with only case, spacing or punctuation changes.
 const same = (a, b) => {
   const norm = s => s.toLowerCase().replace(/[^\p{L}\p{N}#]+/gu, ' ').trim();
@@ -141,6 +152,7 @@ export default async function handler(req, res) {
       const problem = same(out, draft) ? 'same' : hasQuestion(out) ? 'question' : null;
       if (problem) out = await callProvider(p, draft, tone, problem);
       if (hasQuestion(out)) out = dropQuestions(out) || out;
+      out = paragraphs(out);
       return res.status(200).json({ text: out, usage: await recordUse(req, res, access) });
     } catch (err) {
       console.error(err.message);
