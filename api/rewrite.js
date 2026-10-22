@@ -29,7 +29,7 @@ Rules:
 - Raise the writing to a professional standard: fix grammar, replace casual or vague words with precise ones, and make it read like a thoughtful professional wrote it.
 - Reframe negative, blunt or self-critical statements (for example "I am lazy") into honest, constructive language a professional audience would respect, such as describing a struggle with motivation. Keep the real meaning; don't turn it into a success story.
 - If the draft is only a sentence or two, develop it into a short post of 2 to 4 short paragraphs: the point, a brief reflection on why it matters or what it's like, and a specific question that invites others to share their experience.
-- Keep every fact, name, number and opinion from the draft. Never invent concrete details: no names, numbers, employers, dates, results or events that are not in the draft. Added reflection must be general and in the author's first person.
+- Keep every fact, name, number and opinion from the draft. Never invent concrete details: no names, numbers, employers, dates, results or events that are not in the draft. Never claim the author did, plans, tried or experienced something the draft does not say, including habits, strategies, consequences or who supported them. Added reflection must be a general observation, not a new claim about the author.
 - Cut clichés and filler: "humbled and honored", "thrilled to share", "let that sink in", "game-changer", "in today's fast-paced world", "couldn't have done it without you", "incredible journey", "next chapter", "Agree?", "Thoughts?", engagement bait.
 - Short paragraphs of 1 to 3 sentences, separated by one blank line.
 - At most 3 relevant hashtags, on the last line. None if the draft has none and none fit naturally.
@@ -73,6 +73,7 @@ function clean(s) {
     .replace(/<\/?draft>/g, '')
     .replace(/\*\*(.+?)\*\*/g, '$1')
     .replace(/^#{1,6}\s+/gm, '')
+    .replace(/[ \t]+$/gm, '')
     .replace(/\n{3,}/g, '\n\n')
     .trim()
     .replace(/^"([\s\S]*)"$/, '$1');
