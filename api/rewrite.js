@@ -1,5 +1,7 @@
 // POST /api/rewrite  { text, tone } -> { text } | { error }
 // Tries Groq first, then falls back to Gemini. Both use the OpenAI-compatible chat API.
+// Free visitors get FREE_DAILY_LIMIT rewrites a day; invited and Pro visitors are unlimited.
+import { FREE_DAILY_LIMIT, getAccess, recordUse } from './_lib/access.js';
 
 const MAX_CHARS = 3000;
 
@@ -119,6 +121,15 @@ export default async function handler(req, res) {
     return res.status(503).json({ error: 'Rewriting is not set up yet. Try again later.' });
   }
 
+  const access = await getAccess(req, res);
+  if (access.plan === 'free' && access.remaining <= 0) {
+    return res.status(429).json({
+      error: `You've used your ${FREE_DAILY_LIMIT} free rewrites for today. They reset at midnight UTC, or enter an invite code for unlimited rewrites.`,
+      code: 'limit',
+      usage: access,
+    });
+  }
+
   const draft = text.trim();
   for (const p of available) {
     try {
@@ -126,7 +137,7 @@ export default async function handler(req, res) {
       const problem = same(out, draft) ? 'same' : hasQuestion(out) ? 'question' : null;
       if (problem) out = await callProvider(p, draft, tone, problem);
       if (hasQuestion(out)) out = dropQuestions(out) || out;
-      return res.status(200).json({ text: out });
+      return res.status(200).json({ text: out, usage: await recordUse(req, res, access) });
     } catch (err) {
       console.error(err.message);
     }

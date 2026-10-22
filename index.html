@@ -175,6 +175,39 @@
   /* pricing */
   .plan { border-radius: 24px; background: rgba(15,37,71,.55); border: 1px solid rgba(255,255,255,.08); }
   .plan-pro { background: linear-gradient(180deg, #11305C, #0F2547); border: 1px solid rgba(26,115,232,.55); box-shadow: var(--shadow-float); }
+  /* dashed edge reads as a ticket: this plan is redeemed, not bought */
+  .plan-invited { border: 1.5px dashed rgba(16,185,129,.45); }
+  .btn.is-done[disabled] { cursor: default; opacity: .7; }
+
+  /* plan indicator in the demo */
+  .pips { display: inline-flex; gap: 4px; }
+  .pips i { width: 8px; height: 8px; border-radius: 999px; background: rgba(255,255,255,.12); transition: transform .35s var(--spring); }
+  .pips i.on { background: var(--teal); }
+  .pips i.spent { transform: scale(.7); }
+  .linkbtn { color: var(--teal); font-weight: 500; text-decoration: underline; text-decoration-color: rgba(16,185,129,.4); text-underline-offset: 4px; border-radius: 4px; cursor: pointer; transition: opacity .2s ease; }
+  .linkbtn:hover { opacity: .8; }
+  .linkbtn:active { opacity: .6; }
+  .linkbtn:focus-visible { outline: 2px solid var(--teal); outline-offset: 3px; }
+
+  /* invite code dialog: a floating surface over a dimmed page */
+  .invite { width: min(440px, calc(100% - 32px)); margin: auto; padding: 0; border: 1px solid rgba(255,255,255,.1); border-radius: 24px; background: linear-gradient(180deg, #12305A, #0F2547); color: #fff; box-shadow: var(--shadow-float); }
+  .invite[open] { animation: inviteIn .45s var(--spring); }
+  @keyframes inviteIn { from { opacity: 0; transform: translateY(12px) scale(.97); } }
+  .invite::backdrop { background: rgba(3,10,22,.72); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); }
+  .invite-input { display: block; width: 100%; border-radius: 14px; background: rgba(9,27,51,.7); border: 1.5px solid var(--navy-line); padding: 14px 16px; font-size: 18px; letter-spacing: .12em; color: #fff; outline: none; }
+  .invite-input::placeholder { color: rgba(169,184,208,.55); letter-spacing: normal; }
+  .invite-input:focus-visible { border-color: var(--teal); box-shadow: 0 0 0 3px rgba(16,185,129,.22); }
+  .invite-input[aria-invalid="true"] { border-color: #FF9C8A; box-shadow: 0 0 0 3px rgba(255,156,138,.18); }
+  .shake { animation: shake .4s var(--ease-out); }
+  @keyframes shake { 20%, 60% { transform: translateX(-6px); } 40%, 80% { transform: translateX(6px); } }
+  .icon-btn { position: relative; display: grid; place-items: center; width: 40px; height: 40px; border-radius: 999px; color: var(--mist); cursor: pointer; transition: transform .3s var(--spring); }
+  .icon-btn::before { content: ""; position: absolute; inset: 0; border-radius: inherit; background: rgba(255,255,255,.08); opacity: 0; transition: opacity .2s ease; }
+  .icon-btn:hover { color: #fff; }
+  .icon-btn:hover::before { opacity: 1; }
+  .icon-btn:active { transform: scale(.9); }
+  .icon-btn:focus-visible { outline: 2px solid var(--teal); outline-offset: 2px; }
+  .icon-btn svg { position: relative; }
+  .dialog-tile { width: 56px; height: 56px; border-radius: 16px; display: grid; place-items: center; background: linear-gradient(135deg, rgba(26,115,232,.22), rgba(16,185,129,.22)); }
 
   /* faq */
   .faq summary { list-style: none; cursor: pointer; }
@@ -295,6 +328,14 @@
             </div>
           </div>
           <p id="demo-error" role="alert" class="mt-3 text-[14px] leading-[1.5] text-[#FF9C8A] empty:hidden"></p>
+          <div id="plan-row" class="mt-4 flex flex-wrap items-center justify-between gap-x-4 gap-y-2 border-t border-white/[.06] pt-4 text-[13.5px] sm:mt-5" hidden>
+            <div class="flex flex-wrap items-center gap-x-3 gap-y-2">
+              <span id="plan-badge" class="chip bg-white/5 text-mist">Free plan</span>
+              <span id="plan-pips" class="pips" aria-hidden="true"></span>
+              <span id="plan-usage" class="text-mist"></span>
+            </div>
+            <button type="button" id="plan-invite" data-invite-open class="linkbtn">Invited user? Enter code</button>
+          </div>
         </div>
       </div>
     </div>
@@ -410,8 +451,9 @@
         <h2 class="text-[36px] sm:text-[48px]">Free to start. Cheap to keep.</h2>
         <p class="mt-5 text-[18px] text-mist">Most people post a few times a week. The free plan covers that.</p>
       </div>
-      <div class="mx-auto mt-16 grid max-w-[880px] gap-6 md:grid-cols-2 md:items-center">
-        <div class="plan p-8 sm:p-10">
+      <div class="mx-auto mt-16 grid max-w-[480px] gap-6 lg:max-w-[1120px] lg:grid-cols-3 lg:items-center">
+        <div class="plan relative p-8 sm:p-10" data-plan-card="free">
+          <span class="chip absolute right-6 top-6 bg-white/10 text-white" data-your-plan hidden>Your plan</span>
           <h3 class="text-[22px]">Free</h3>
           <p class="mt-4 flex items-baseline gap-2"><span class="font-display text-[48px] font-bold leading-none tracking-[-0.03em]">$0</span></p>
           <p class="mt-3 text-[15px] text-mist">For posting now and then.</p>
@@ -422,8 +464,9 @@
           </ul>
           <a href="#demo" data-focus-demo class="btn btn-secondary mt-10 w-full">Start free</a>
         </div>
-        <div class="plan plan-pro relative p-8 sm:p-10">
-          <span class="chip absolute right-6 top-6 bg-teal/15 text-teal">Most popular</span>
+        <div class="plan plan-pro relative p-8 sm:p-10" data-plan-card="pro">
+          <span class="chip absolute right-6 top-6 bg-teal/15 text-teal" data-popular>Most popular</span>
+          <span class="chip absolute right-6 top-6 bg-royal/25 text-white" data-your-plan hidden>Your plan</span>
           <h3 class="text-[22px]">Pro</h3>
           <p class="mt-4 flex items-baseline gap-2"><span class="font-display text-[48px] font-bold leading-none tracking-[-0.03em]">$9</span><span class="text-mist">/ month</span></p>
           <p class="mt-3 text-[15px] text-mist">For people who post every week.</p>
@@ -434,6 +477,18 @@
             <li class="flex gap-3"><svg class="mt-1 shrink-0" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#10B981" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>Headline and About section rewrites</li>
           </ul>
           <a href="#pricing" class="btn btn-primary mt-10 w-full">Get Pro</a>
+        </div>
+        <div class="plan plan-invited relative p-8 sm:p-10" data-plan-card="invited">
+          <span class="chip absolute right-6 top-6 bg-teal/15 text-teal" data-your-plan hidden>Your plan</span>
+          <h3 class="text-[22px]">Invited</h3>
+          <p class="mt-4 flex items-baseline gap-2"><span class="font-display text-[48px] font-bold leading-none tracking-[-0.03em]">$0</span><span class="text-mist">with a code</span></p>
+          <p class="mt-3 text-[15px] text-mist">Pro access for people we've invited.</p>
+          <ul class="mt-8 space-y-3 text-[15px]">
+            <li class="flex gap-3"><svg class="mt-1 shrink-0" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#10B981" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>Unlimited rewrites</li>
+            <li class="flex gap-3"><svg class="mt-1 shrink-0" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#10B981" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>Everything in Pro</li>
+            <li class="flex gap-3"><svg class="mt-1 shrink-0" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#10B981" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>Enter your code once per browser</li>
+          </ul>
+          <button type="button" id="invite-card-btn" data-invite-open class="btn btn-secondary mt-10 w-full">Enter invite code</button>
         </div>
       </div>
     </div>
@@ -510,6 +565,40 @@
     <p class="text-[13px] text-mist/70">© 2026 Simple LinkedIn Rewriter. Not affiliated with LinkedIn.</p>
   </div>
 </footer>
+
+<dialog id="invite" class="invite" aria-labelledby="invite-title">
+  <div class="relative p-6 sm:p-8">
+    <button type="button" class="icon-btn absolute right-3 top-3" data-invite-close aria-label="Close">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg>
+    </button>
+
+    <form id="invite-ask" novalidate>
+      <div class="dialog-tile">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="url(#brandGrad)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="7.5" cy="15.5" r="5.5"/><path d="m21 2-9.6 9.6"/><path d="m15.5 7.5 3 3L22 7l-3-3"/></svg>
+      </div>
+      <h2 id="invite-title" class="mt-6 text-[28px] sm:text-[32px]">Enter your invite code</h2>
+      <p class="mt-3 text-[15px] text-mist">Invited users get everything in Pro, including unlimited rewrites.</p>
+      <label for="invite-code" class="mt-6 block text-[14px] font-medium">Invite code</label>
+      <input id="invite-code" class="invite-input mt-2" inputmode="numeric" autocomplete="off" spellcheck="false" maxlength="32" placeholder="Your code" aria-describedby="invite-error">
+      <p id="invite-error" role="alert" class="mt-3 text-[14px] leading-[1.5] text-[#FF9C8A] empty:hidden"></p>
+      <div class="mt-8 flex flex-wrap justify-end gap-3">
+        <button type="button" class="btn btn-secondary btn-sm" data-invite-close>Cancel</button>
+        <button type="submit" id="invite-submit" class="btn btn-primary btn-sm">Verify code</button>
+      </div>
+    </form>
+
+    <div id="invite-done" hidden>
+      <div class="dialog-tile">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#10B981" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9.5"/><path d="m8 12.5 2.8 2.8L16.5 9.5"/></svg>
+      </div>
+      <h2 class="mt-6 text-[28px] sm:text-[32px]">Invited access is on</h2>
+      <p class="mt-3 text-[15px] text-mist">You have unlimited rewrites in every tone, the same as Pro. It stays on in this browser.</p>
+      <div class="mt-8 flex justify-end">
+        <button type="button" id="invite-finish" class="btn btn-primary btn-sm">Start rewriting</button>
+      </div>
+    </div>
+  </div>
+</dialog>
 
 <script>
   // ---------- Nav background on scroll ----------
@@ -612,6 +701,7 @@ Excited for this next chapter and can't wait to see what the future holds!
         signal: AbortSignal.timeout(45000),
       });
       const data = await res.json().catch(() => ({}));
+      if (data.usage) setUsage(data.usage);
       if (!res.ok || !data.text) throw new Error(data.error || 'The rewriter is busy right now. Try again in a minute.');
       cache.set(key, data.text);
       ok = true;
@@ -662,6 +752,97 @@ Excited for this next chapter and can't wait to see what the future holds!
     try { await navigator.clipboard.writeText(result); copyBtn.textContent = 'Copied'; }
     catch { copyBtn.textContent = 'Select and copy'; }
     setTimeout(() => (copyBtn.textContent = 'Copy'), 1600);
+  });
+
+  // ---------- Plan: free (5 a day), invited or Pro (unlimited) ----------
+  const PLAN = {
+    free: { label: 'Free plan', chip: 'bg-white/5 text-mist' },
+    invited: { label: 'Invited', chip: 'bg-teal/15 text-teal' },
+    pro: { label: 'Pro', chip: 'bg-royal/25 text-white' },
+  };
+  const planRow = document.getElementById('plan-row'), planBadge = document.getElementById('plan-badge');
+  const planPips = document.getElementById('plan-pips'), planUsage = document.getElementById('plan-usage');
+  const planInvite = document.getElementById('plan-invite'), inviteCardBtn = document.getElementById('invite-card-btn');
+
+  function setUsage(u) {
+    if (!PLAN[u?.plan]) return;
+    const free = u.plan === 'free';
+    planBadge.className = 'chip ' + PLAN[u.plan].chip;
+    planBadge.textContent = PLAN[u.plan].label;
+    planPips.hidden = !free;
+    if (free) planPips.innerHTML = Array.from({ length: u.limit }, (_, i) => `<i class="${i < u.remaining ? 'on' : 'spent'}"></i>`).join('');
+    planUsage.textContent = !free ? 'Unlimited rewrites'
+      : u.remaining > 0 ? `${u.remaining} of ${u.limit} free rewrites left today`
+      : 'No free rewrites left today. More at midnight UTC.';
+    planInvite.hidden = !free;
+    planRow.hidden = false;
+
+    document.querySelectorAll('[data-plan-card]').forEach(card => {
+      card.querySelector('[data-your-plan]').hidden = card.dataset.planCard !== u.plan;
+    });
+    document.querySelector('[data-popular]').hidden = u.plan === 'pro';
+    const invited = u.plan === 'invited';
+    inviteCardBtn.disabled = invited;
+    inviteCardBtn.classList.toggle('is-done', invited);
+    inviteCardBtn.textContent = invited ? 'Invited access is on' : 'Enter invite code';
+  }
+
+  fetch('/api/status').then(r => (r.ok ? r.json() : null)).then(setUsage).catch(() => {});
+
+  // ---------- Invite code dialog ----------
+  const dlg = document.getElementById('invite'), askForm = document.getElementById('invite-ask');
+  const doneView = document.getElementById('invite-done'), codeInput = document.getElementById('invite-code');
+  const inviteError = document.getElementById('invite-error'), inviteSubmit = document.getElementById('invite-submit');
+
+  function inviteFail(msg) {
+    inviteError.textContent = msg;
+    codeInput.setAttribute('aria-invalid', 'true');
+    codeInput.classList.remove('shake'); void codeInput.offsetWidth; codeInput.classList.add('shake');
+    codeInput.focus(); codeInput.select();
+  }
+
+  function openInvite() {
+    askForm.hidden = false; doneView.hidden = true;
+    codeInput.value = ''; inviteError.textContent = ''; codeInput.removeAttribute('aria-invalid');
+    dlg.showModal();
+    codeInput.focus();
+  }
+
+  document.querySelectorAll('[data-invite-open]').forEach(b => b.addEventListener('click', openInvite));
+  dlg.querySelectorAll('[data-invite-close]').forEach(b => b.addEventListener('click', () => dlg.close()));
+  dlg.addEventListener('click', e => { if (e.target === dlg) dlg.close(); }); // click on the dimmed backdrop
+  codeInput.addEventListener('input', () => { inviteError.textContent = ''; codeInput.removeAttribute('aria-invalid'); });
+
+  askForm.addEventListener('submit', async e => {
+    e.preventDefault();
+    const code = codeInput.value.trim();
+    if (!code) return inviteFail('Enter your invite code.');
+    inviteSubmit.disabled = true; inviteSubmit.textContent = 'Checking…';
+    try {
+      const res = await fetch('/api/invite', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ code }),
+        signal: AbortSignal.timeout(15000),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(data.error || "Couldn't check the code. Try again.");
+      setUsage(data.usage);
+      showError('');
+      askForm.hidden = true; doneView.hidden = false;
+      document.getElementById('invite-finish').focus();
+    } catch (err) {
+      inviteFail(err.name === 'TypeError' || err.name === 'TimeoutError'
+        ? "Couldn't reach the server. Check your connection and try again."
+        : err.message);
+    } finally {
+      inviteSubmit.disabled = false; inviteSubmit.textContent = 'Verify code';
+    }
+  });
+
+  document.getElementById('invite-finish').addEventListener('click', () => {
+    dlg.close();
+    document.getElementById('demo').scrollIntoView({ behavior: 'smooth', block: 'center' });
   });
 
   document.querySelectorAll('[data-focus-demo]').forEach(a => a.addEventListener('click', () => {
