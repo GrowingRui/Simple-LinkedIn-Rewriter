@@ -177,7 +177,6 @@
   .plan-pro { background: linear-gradient(180deg, #11305C, #0F2547); border: 1px solid rgba(26,115,232,.55); box-shadow: var(--shadow-float); }
   /* dashed edge reads as a ticket: this plan is redeemed, not bought */
   .plan-invited { border: 1.5px dashed rgba(16,185,129,.45); }
-  .btn.is-done[disabled] { cursor: default; opacity: .7; }
 
   /* plan indicator in the demo */
   .pips { display: inline-flex; gap: 4px; }
@@ -486,7 +485,7 @@
           <ul class="mt-8 space-y-3 text-[15px]">
             <li class="flex gap-3"><svg class="mt-1 shrink-0" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#10B981" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>Unlimited rewrites</li>
             <li class="flex gap-3"><svg class="mt-1 shrink-0" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#10B981" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>Everything in Pro</li>
-            <li class="flex gap-3"><svg class="mt-1 shrink-0" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#10B981" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>Enter your code once per browser</li>
+            <li class="flex gap-3"><svg class="mt-1 shrink-0" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#10B981" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>Lasts until you close the tab</li>
           </ul>
           <button type="button" id="invite-card-btn" data-invite-open class="btn btn-secondary mt-10 w-full">Enter invite code</button>
         </div>
@@ -499,7 +498,7 @@
     <div class="wrap grid gap-12 lg:grid-cols-12">
       <div class="lg:col-span-4">
         <h2 class="text-[36px] sm:text-[48px]">Questions</h2>
-        <p class="mt-5 text-[18px] text-slate">Something else? Email <a href="mailto:hello@example.com" class="focusable rounded font-medium text-royal underline decoration-royal/30 underline-offset-4 transition-opacity hover:opacity-80 active:opacity-60">hello@example.com</a>.</p>
+        <p class="mt-5 text-[18px] text-slate">Something else? Email <a href="mailto:xiarui091@gmail.com" class="focusable rounded font-medium text-royal underline decoration-royal/30 underline-offset-4 transition-opacity hover:opacity-80 active:opacity-60">xiarui091@gmail.com</a>.</p>
       </div>
       <div class="faq divide-y divide-ink/10 border-y border-ink/10 lg:col-span-8">
         <details class="group py-6" open>
@@ -592,7 +591,7 @@
         <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#10B981" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9.5"/><path d="m8 12.5 2.8 2.8L16.5 9.5"/></svg>
       </div>
       <h2 class="mt-6 text-[28px] sm:text-[32px]">Invited access is on</h2>
-      <p class="mt-3 text-[15px] text-mist">You have unlimited rewrites in every tone, the same as Pro. It stays on in this browser.</p>
+      <p class="mt-3 text-[15px] text-mist">You have unlimited rewrites in every tone, the same as Pro. It stays on until you close this tab.</p>
       <div class="mt-8 flex justify-end">
         <button type="button" id="invite-finish" class="btn btn-primary btn-sm">Start rewriting</button>
       </div>
@@ -696,7 +695,7 @@ Excited for this next chapter and can't wait to see what the future holds!
     try {
       const res = await fetch('/api/rewrite', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: apiHeaders(),
         body: JSON.stringify({ text, tone }),
         signal: AbortSignal.timeout(45000),
       });
@@ -763,9 +762,18 @@ Excited for this next chapter and can't wait to see what the future holds!
   const planRow = document.getElementById('plan-row'), planBadge = document.getElementById('plan-badge');
   const planPips = document.getElementById('plan-pips'), planUsage = document.getElementById('plan-usage');
   const planInvite = document.getElementById('plan-invite'), inviteCardBtn = document.getElementById('invite-card-btn');
+  let plan = 'free';
+
+  // Invited access lives in sessionStorage, so it survives a refresh but ends when the tab closes.
+  const TOKEN_KEY = 'slr_access';
+  const getToken = () => { try { return sessionStorage.getItem(TOKEN_KEY); } catch { return null; } };
+  const setToken = t => { try { t ? sessionStorage.setItem(TOKEN_KEY, t) : sessionStorage.removeItem(TOKEN_KEY); } catch {} };
+  const apiHeaders = () => ({ 'Content-Type': 'application/json', ...(getToken() ? { 'X-Access-Token': getToken() } : {}) });
 
   function setUsage(u) {
     if (!PLAN[u?.plan]) return;
+    plan = u.plan;
+    if (plan === 'free') setToken(null); // the server no longer accepts it (expired or code changed)
     const free = u.plan === 'free';
     planBadge.className = 'chip ' + PLAN[u.plan].chip;
     planBadge.textContent = PLAN[u.plan].label;
@@ -774,20 +782,27 @@ Excited for this next chapter and can't wait to see what the future holds!
     planUsage.textContent = !free ? 'Unlimited rewrites'
       : u.remaining > 0 ? `${u.remaining} of ${u.limit} free rewrites left today`
       : 'No free rewrites left today. More at midnight UTC.';
-    planInvite.hidden = !free;
+    planInvite.hidden = u.plan === 'pro';
+    planInvite.textContent = free ? 'Invited user? Enter code' : 'Switch to free plan';
     planRow.hidden = false;
 
     document.querySelectorAll('[data-plan-card]').forEach(card => {
       card.querySelector('[data-your-plan]').hidden = card.dataset.planCard !== u.plan;
     });
     document.querySelector('[data-popular]').hidden = u.plan === 'pro';
-    const invited = u.plan === 'invited';
-    inviteCardBtn.disabled = invited;
-    inviteCardBtn.classList.toggle('is-done', invited);
-    inviteCardBtn.textContent = invited ? 'Invited access is on' : 'Enter invite code';
+    inviteCardBtn.textContent = u.plan === 'invited' ? 'Switch to free plan' : 'Enter invite code';
   }
 
-  fetch('/api/status').then(r => (r.ok ? r.json() : null)).then(setUsage).catch(() => {});
+  const loadStatus = () => fetch('/api/status', { headers: apiHeaders() })
+    .then(r => (r.ok ? r.json() : null)).then(setUsage).catch(() => {});
+  loadStatus();
+
+  // Leaving is local: drop the token and ask the server what this visitor gets as a free user.
+  function leaveInvited() {
+    setToken(null);
+    planUsage.textContent = 'Switching to the free plan…';
+    loadStatus();
+  }
 
   // ---------- Invite code dialog ----------
   const dlg = document.getElementById('invite'), askForm = document.getElementById('invite-ask');
@@ -808,7 +823,7 @@ Excited for this next chapter and can't wait to see what the future holds!
     codeInput.focus();
   }
 
-  document.querySelectorAll('[data-invite-open]').forEach(b => b.addEventListener('click', openInvite));
+  document.querySelectorAll('[data-invite-open]').forEach(b => b.addEventListener('click', () => (plan === 'invited' ? leaveInvited() : openInvite())));
   dlg.querySelectorAll('[data-invite-close]').forEach(b => b.addEventListener('click', () => dlg.close()));
   dlg.addEventListener('click', e => { if (e.target === dlg) dlg.close(); }); // click on the dimmed backdrop
   codeInput.addEventListener('input', () => { inviteError.textContent = ''; codeInput.removeAttribute('aria-invalid'); });
@@ -827,6 +842,7 @@ Excited for this next chapter and can't wait to see what the future holds!
       });
       const data = await res.json().catch(() => ({}));
       if (!res.ok) throw new Error(data.error || "Couldn't check the code. Try again.");
+      setToken(data.token);
       setUsage(data.usage);
       showError('');
       askForm.hidden = true; doneView.hidden = false;

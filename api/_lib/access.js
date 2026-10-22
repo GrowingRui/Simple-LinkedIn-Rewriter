@@ -1,5 +1,6 @@
 // Plans, daily free usage and invite codes.
-// A visitor's plan lives in a signed cookie, so it can't be forged in the browser.
+// Invited access is a signed token the page keeps in sessionStorage and sends as the
+// X-Access-Token header, so it can't be forged and ends when the tab is closed.
 // Free usage is counted in Upstash Redis when it's connected; otherwise in a signed
 // cookie, which works with no setup but resets if the visitor clears cookies.
 import { createHash, createHmac, randomUUID, timingSafeEqual } from 'node:crypto';
@@ -8,6 +9,7 @@ export const FREE_DAILY_LIMIT = 5;
 const IP_DAILY_LIMIT = FREE_DAILY_LIMIT * 4; // headroom for offices and schools sharing one IP
 const INVITE_ATTEMPTS_PER_HOUR = 10;
 const YEAR = 60 * 60 * 24 * 365, TWO_DAYS = 60 * 60 * 48;
+const ACCESS_TTL_MS = 12 * 60 * 60 * 1000; // a tab left open still drops back to free after this
 
 // ---------- signing ----------
 // Falls back to a key derived from existing secrets, so SESSION_SECRET is optional.
@@ -62,9 +64,11 @@ function visitorId(req, res) {
 }
 const usageKeys = (req, res) => [`use:${today()}:v:${visitorId(req, res)}`, `use:${today()}:ip:${clientIp(req)}`];
 
-function getPlan(req) {
-  const plan = unsign(readCookies(req).slr_access);
-  return plan === 'invited' || plan === 'pro' ? plan : 'free';
+function getPlan(req, res) {
+  // Invited access used to be a year-long cookie; expire any left over from that version.
+  if (readCookies(req).slr_access) setCookie(res, 'slr_access', '', 0);
+  const [plan, expires] = (unsign(String(req.headers['x-access-token'] || '')) || '').split(':');
+  return (plan === 'invited' || plan === 'pro') && +expires > Date.now() ? plan : 'free';
 }
 
 async function freeRemaining(req, res) {
@@ -82,7 +86,7 @@ async function freeRemaining(req, res) {
 
 // { plan: 'free' | 'invited' | 'pro', limit, remaining, resetsAt } — limit/remaining are null when unlimited.
 export async function getAccess(req, res) {
-  const plan = getPlan(req);
+  const plan = getPlan(req, res);
   if (plan !== 'free') return { plan, limit: null, remaining: null, resetsAt: null };
   return { plan, limit: FREE_DAILY_LIMIT, remaining: await freeRemaining(req, res), resetsAt: nextMidnightUTC() };
 }
@@ -101,7 +105,7 @@ export async function recordUse(req, res, access) {
   return { ...access, remaining };
 }
 
-// -> { status, body }. On success the visitor gets a signed 'invited' cookie for a year.
+// -> { status, body }. On success the body carries the signed access token for the page to keep.
 export async function redeemInvite(req, res, code) {
   const expected = process.env.INVITE_CODE;
   if (!expected) {
@@ -119,6 +123,11 @@ export async function redeemInvite(req, res, code) {
   if (!given) return { status: 400, body: { error: 'Enter your invite code.' } };
   if (!sameText(given, expected.trim())) return { status: 400, body: { error: "That invite code isn't valid. Check it and try again." } };
 
-  setCookie(res, 'slr_access', sign('invited'), YEAR);
-  return { status: 200, body: { usage: { plan: 'invited', limit: null, remaining: null, resetsAt: null } } };
+  return {
+    status: 200,
+    body: {
+      token: sign(`invited:${Date.now() + ACCESS_TTL_MS}`),
+      usage: { plan: 'invited', limit: null, remaining: null, resetsAt: null },
+    },
+  };
 }
