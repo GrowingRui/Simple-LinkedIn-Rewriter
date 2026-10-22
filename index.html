@@ -172,6 +172,15 @@
   .cliche::after { content: ""; position: absolute; left: 14px; right: 14px; top: 50%; height: 2px; border-radius: 2px; background: var(--teal); transform: scaleX(0); transform-origin: left; transition: transform .7s var(--ease-out); }
   .struck .cliche::after { transform: scaleX(1); }
 
+  /* reviews: elevated cards in a staggered column flow */
+  .review { break-inside: avoid; margin-bottom: var(--s3); padding: var(--s4); border-radius: 20px; background: #fff; box-shadow: var(--shadow-elev); }
+  @media (min-width: 1024px) { .review { margin-bottom: var(--s4); } }
+  .review blockquote { font-size: 16.5px; line-height: 1.65; color: #18263C; }
+  .stars { width: 108px; height: 18px; background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='22' height='18' viewBox='0 0 22 18'%3E%3Cpath fill='%2310B981' d='M9 .8l2.5 5.1 5.6.8-4 3.9.9 5.6L9 13.6l-5 2.6.9-5.6-4-3.9 5.6-.8z'/%3E%3C/svg%3E") left center / 22px 18px repeat-x; }
+  .person { display: flex; align-items: center; gap: 12px; margin-top: var(--s3); padding-top: var(--s3); border-top: 1px solid rgba(9,27,51,.08); font-size: 14px; line-height: 1.4; color: var(--slate); }
+  .person b { display: block; font-size: 15px; font-weight: 600; color: var(--ink); }
+  .avatar { display: grid; place-items: center; width: 40px; height: 40px; flex-shrink: 0; border-radius: 999px; font-family: Outfit, system-ui, sans-serif; font-size: 14px; font-weight: 600; color: #fff; background: linear-gradient(135deg, var(--a), var(--b)); }
+
   /* pricing */
   .plan { border-radius: 24px; background: rgba(15,37,71,.55); border: 1px solid rgba(255,255,255,.08); }
   .plan-pro { background: linear-gradient(180deg, #11305C, #0F2547); border: 1px solid rgba(26,115,232,.55); box-shadow: var(--shadow-float); }
@@ -445,8 +454,53 @@
     </div>
   </section>
 
+  <!-- Reviews. SAMPLE CONTENT: these are placeholder reviews, not from real users. The section is
+       hidden everywhere except localhost (see the script) until real reviews replace them. -->
+  <section id="reviews" class="light-bg section relative text-ink" data-sample-reviews hidden>
+    <div class="wrap">
+      <div class="max-w-[40rem]">
+        <span class="chip bg-[#FFE9E4] text-[#B8442F]">Sample reviews, shown on localhost only</span>
+        <h2 class="mt-5 text-[36px] sm:text-[48px]">Posts people are glad they published.</h2>
+        <p class="mt-5 text-[18px] text-slate">What people say after using it on their own drafts.</p>
+      </div>
+
+      <div class="mt-16 gap-6 sm:columns-2 lg:columns-3 lg:gap-8">
+        <figure class="review">
+          <div class="stars" role="img" aria-label="5 out of 5 stars"></div>
+          <blockquote class="mt-4">I used to spend half an hour fiddling with a launch post. Now I paste my notes, pick Concise, and change one line. The first sentence finally says what the post is about.</blockquote>
+          <figcaption class="person"><span class="avatar" style="--a:#1A73E8;--b:#10B981">PR</span><span><b>Priya Raman</b>Product Marketing Manager</span></figcaption>
+        </figure>
+        <figure class="review">
+          <div class="stars" role="img" aria-label="5 out of 5 stars"></div>
+          <blockquote class="mt-4">I'm not a writer and my posts showed it. Storytelling turned a dry list of what I shipped into something people actually commented on.</blockquote>
+          <figcaption class="person"><span class="avatar" style="--a:#10B981;--b:#0F2547">DO</span><span><b>Daniel Okafor</b>Backend Engineer</span></figcaption>
+        </figure>
+        <figure class="review">
+          <div class="stars" role="img" aria-label="5 out of 5 stars"></div>
+          <blockquote class="mt-4">Our job posts were full of rockstars and fast-paced environments. It cut the clichés and kept the details candidates care about: the team, the stack, the salary range.</blockquote>
+          <figcaption class="person"><span class="avatar" style="--a:#155FC2;--b:#1A73E8">LF</span><span><b>Lucía Fernández</b>Technical Recruiter</span></figcaption>
+        </figure>
+        <figure class="review">
+          <div class="stars" role="img" aria-label="5 out of 5 stars"></div>
+          <blockquote class="mt-4">What I like most is what it doesn't do. It never added numbers or results I hadn't mentioned, so I can post without checking every line twice.</blockquote>
+          <figcaption class="person"><span class="avatar" style="--a:#0F2547;--b:#10B981">TB</span><span><b>Tom Becker</b>Founder, design studio</span></figcaption>
+        </figure>
+        <figure class="review">
+          <div class="stars" role="img" aria-label="5 out of 5 stars"></div>
+          <blockquote class="mt-4">Five free rewrites a day is plenty for me. I run every post about my research through it, and it reads like me on a good day.</blockquote>
+          <figcaption class="person"><span class="avatar" style="--a:#10B981;--b:#1A73E8">AK</span><span><b>Aisha Khan</b>PhD Candidate</span></figcaption>
+        </figure>
+        <figure class="review">
+          <div class="stars" role="img" aria-label="5 out of 5 stars"></div>
+          <blockquote class="mt-4">Flipping between Professional and Concise before I post is the feature I didn't know I needed. Most of the time I end up somewhere in between and finish it myself.</blockquote>
+          <figcaption class="person"><span class="avatar" style="--a:#1A73E8;--b:#0F2547">MR</span><span><b>Marco Rossi</b>Sales Lead</span></figcaption>
+        </figure>
+      </div>
+    </div>
+  </section>
+
   <!-- Pricing -->
-  <section id="pricing" class="dark-bg section relative pt-0 lg:pt-0">
+  <section id="pricing" class="dark-bg section relative">
     <div class="wrap">
       <div class="mx-auto max-w-[36rem] text-center">
         <h2 class="text-[36px] sm:text-[48px]">Free to start. Cheap to keep.</h2>
@@ -938,6 +992,12 @@ Excited for this next chapter and can't wait to see what the future holds!
     });
   });
   showExample(0, false);
+
+  // ---------- Reviews ----------
+  // Placeholder reviews: only shown on localhost until real ones replace them.
+  if (/^(localhost|127\.0\.0\.1)$/.test(location.hostname)) {
+    document.querySelectorAll('[data-sample-reviews]').forEach(s => (s.hidden = false));
+  }
 
   // ---------- Strike clichés when visible ----------
   const cl = document.getElementById('cliches');
