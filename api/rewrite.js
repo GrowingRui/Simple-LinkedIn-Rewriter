@@ -26,7 +26,7 @@ Rules:
 - Put the main point in the first line. No warm-up.
 - Keep every fact, name, number and opinion from the draft. Never add facts, numbers, names, results or anecdotes that are not in the draft.
 - Keep the author's voice and first person. Plain, specific words.
-- Cut clichés and filler: "humbled and honored", "thrilled to share", "let that sink in", "game-changer", "in today's fast-paced world", "Agree?", "Thoughts?", engagement bait.
+- Cut clichés and filler: "humbled and honored", "thrilled to share", "let that sink in", "game-changer", "in today's fast-paced world", "couldn't have done it without you", "incredible journey", "next chapter", "Agree?", "Thoughts?", engagement bait.
 - Short paragraphs of 1 to 3 sentences, separated by one blank line.
 - At most 3 relevant hashtags, on the last line. None if the draft has none and none fit naturally.
 - At most one emoji, and only if the draft used emoji.
@@ -36,7 +36,7 @@ Rules:
 
 const TONES = {
   professional: 'Tone: professional. Clear, confident and warm. Lead with what happened, then why it matters, then a brief thank-you or invitation if the draft has one.',
-  concise: 'Tone: concise. As short as possible while keeping the key facts: aim for under half the length of the draft. 2 to 4 short paragraphs.',
+  concise: 'Tone: concise. The shortest version that keeps the key facts: under 40 words before the hashtags, in 1 or 2 short paragraphs. Drop generic thank-yous and sign-offs unless they name someone.',
   story: 'Tone: storytelling. Open with a concrete moment or detail that is in the draft, then build to the main point. Use only details from the draft; if it has no story to tell, keep the narrative light rather than inventing one.',
 };
 
