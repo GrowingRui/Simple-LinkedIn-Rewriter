@@ -41,7 +41,7 @@ Rules:
 - Output only the rewritten post, nothing before or after it.`;
 
 const TONES = {
-  professional: 'Tone: professional. Clear, confident and warm. Lead with what happened, then why it matters, then a professional insight or takeaway, and a brief thank-you if the draft has one.',
+  professional: 'Tone: professional. Clear, confident and warm. Lead with what happened, then why it matters, then a professional insight or takeaway, and a brief thank-you if the draft has one. Write the insight as a general observation ("What helps is...", "Teams that..."), never as steps the author took unless the draft says so.',
   concise: 'Tone: concise. The shortest polished version that keeps the key facts: under 40 words before the hashtags, in 1 or 2 short paragraphs. Drop generic thank-yous and sign-offs unless they name someone. For a one-line draft, concise still means a professional rewrite, not a copy.',
   story: 'Tone: storytelling. Open with a concrete moment or detail that is in the draft, then build to the main point and close with the lesson it holds. Use only events from the draft; if it has no story to tell, keep the narrative light rather than inventing one. Never describe steps, habits or changes the author made unless the draft says so; give advice as general insight, not as something the author did.',
 };
