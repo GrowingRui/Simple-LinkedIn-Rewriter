@@ -1,0 +1,700 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Simple LinkedIn Rewriter</title>
+<meta name="description" content="Paste a rough LinkedIn draft and get a clear, human post back in seconds. Keeps your voice, cuts the clichés.">
+<link rel="icon" href="brand_assets/logo-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Outfit:wght@500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+  tailwind.config = {
+    theme: {
+      extend: {
+        colors: {
+          navy: { DEFAULT: '#091B33', raised: '#0F2547', line: '#1D3559' },
+          royal: { DEFAULT: '#1A73E8', deep: '#155FC2' },
+          teal: { DEFAULT: '#10B981' },
+          mist: '#A9B8D0',
+          paper: '#F3F6FB',
+          ink: '#091B33',
+          slate: '#4A5B76',
+        },
+        fontFamily: {
+          display: ['Outfit', 'system-ui', 'sans-serif'],
+          sans: ['Inter', 'system-ui', 'sans-serif'],
+        },
+      },
+    },
+  };
+</script>
+<style>
+  :root {
+    --navy: #091B33; --navy-raised: #0F2547; --navy-line: #1D3559;
+    --royal: #1A73E8; --royal-deep: #155FC2; --teal: #10B981;
+    --white: #FFFFFF; --mist: #A9B8D0; --paper: #F3F6FB; --slate: #4A5B76;
+    --spring: cubic-bezier(.34, 1.56, .64, 1);
+    --ease-out: cubic-bezier(.22, 1, .36, 1);
+    /* spacing tokens (8px base) */
+    --s1: 8px; --s2: 16px; --s3: 24px; --s4: 32px; --s6: 48px; --s8: 64px; --s12: 96px; --s16: 128px;
+    /* depth: base -> elevated -> floating */
+    --shadow-elev: 0 1px 2px rgba(9,27,51,.06), 0 4px 12px -4px rgba(9,27,51,.08), 0 16px 32px -16px rgba(26,115,232,.18);
+    --shadow-float: 0 2px 4px rgba(3,10,22,.25), 0 24px 48px -16px rgba(3,10,22,.6), 0 48px 96px -32px rgba(26,115,232,.35);
+    --shadow-btn: 0 1px 1px rgba(3,10,22,.2), 0 6px 16px -6px rgba(26,115,232,.65);
+  }
+  html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
+  body { background: var(--navy); color: var(--white); font-family: Inter, system-ui, sans-serif; line-height: 1.7; -webkit-font-smoothing: antialiased; }
+  h1, h2, h3, .font-display { font-family: Outfit, system-ui, sans-serif; }
+  h1, h2 { letter-spacing: -0.03em; line-height: 1.05; font-weight: 700; }
+  h3 { letter-spacing: -0.015em; line-height: 1.25; font-weight: 600; }
+  ::selection { background: rgba(16,185,129,.35); }
+
+  /* grain */
+  .grain::after {
+    content: ""; position: absolute; inset: 0; pointer-events: none; opacity: .07; mix-blend-mode: overlay;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 .9 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+  .hero-bg {
+    background:
+      radial-gradient(60% 55% at 85% 10%, rgba(26,115,232,.28), transparent 70%),
+      radial-gradient(45% 50% at 10% 95%, rgba(16,185,129,.16), transparent 70%),
+      radial-gradient(30% 30% at 55% 55%, rgba(26,115,232,.10), transparent 70%),
+      var(--navy);
+  }
+  .dark-bg {
+    background:
+      radial-gradient(50% 40% at 0% 0%, rgba(16,185,129,.12), transparent 70%),
+      radial-gradient(55% 45% at 100% 60%, rgba(26,115,232,.18), transparent 70%),
+      var(--navy);
+  }
+  .light-bg {
+    background:
+      radial-gradient(50% 40% at 100% 0%, rgba(26,115,232,.08), transparent 70%),
+      radial-gradient(40% 40% at 0% 100%, rgba(16,185,129,.07), transparent 70%),
+      var(--paper);
+  }
+
+  .section { padding-block: var(--s12); }
+  @media (min-width: 1024px) { .section { padding-block: var(--s16); } }
+  .wrap { max-width: 1200px; margin-inline: auto; padding-inline: var(--s3); }
+  @media (min-width: 768px) { .wrap { padding-inline: var(--s4); } }
+
+  /* buttons */
+  .btn { display: inline-flex; align-items: center; justify-content: center; gap: 10px; border-radius: 999px; font-weight: 600; font-size: 15px; line-height: 1; padding: 15px 26px; cursor: pointer; transition: transform .35s var(--spring), opacity .2s ease; will-change: transform; position: relative; white-space: nowrap; }
+  .btn:hover { transform: translateY(-2px); }
+  .btn:active { transform: translateY(0) scale(.97); transition-duration: .1s; }
+  .btn:focus-visible, .focusable:focus-visible { outline: 2px solid var(--teal); outline-offset: 3px; }
+  .btn-primary { background: var(--royal); color: #fff; box-shadow: var(--shadow-btn); }
+  .btn-primary::after { content: ""; position: absolute; inset: 0; border-radius: inherit; background: linear-gradient(180deg, rgba(255,255,255,.18), transparent 60%); opacity: 0; transition: opacity .25s ease; }
+  .btn-primary:hover::after { opacity: 1; }
+  .btn-primary:active::after { opacity: .4; }
+  .btn-secondary { color: #fff; border: 1.5px solid rgba(255,255,255,.85); }
+  .btn-secondary::before { content: ""; position: absolute; inset: 0; border-radius: inherit; background: rgba(255,255,255,.08); opacity: 0; transition: opacity .25s ease; }
+  .btn-secondary:hover::before { opacity: 1; }
+  .btn-secondary-dark { color: var(--navy); border: 1.5px solid var(--navy); }
+  .btn-secondary-dark::before { content: ""; position: absolute; inset: 0; border-radius: inherit; background: rgba(9,27,51,.06); opacity: 0; transition: opacity .25s ease; }
+  .btn-secondary-dark:hover::before { opacity: 1; }
+  .btn[disabled] { cursor: progress; opacity: .75; transform: none; }
+  .btn-sm { padding: 11px 18px; font-size: 14px; }
+
+  .navlink { position: relative; color: var(--mist); font-size: 15px; font-weight: 500; padding: 6px 2px; border-radius: 6px; transition: opacity .2s ease; }
+  .navlink span { position: relative; display: inline-block; transition: transform .3s var(--spring); }
+  .navlink::after { content: ""; position: absolute; left: 2px; right: 2px; bottom: 0; height: 2px; border-radius: 2px; background: linear-gradient(90deg, var(--royal), var(--teal)); transform: scaleX(0); transform-origin: left; transition: transform .35s var(--ease-out); }
+  .navlink:hover { color: #fff; }
+  .navlink:hover::after { transform: scaleX(1); }
+  .navlink:active span { transform: translateY(1px); }
+  .navlink:focus-visible { outline: 2px solid var(--teal); outline-offset: 4px; color: #fff; }
+
+  .nav-shell { transition: opacity .3s ease; }
+  .nav-bg { position: absolute; inset: 0; background: rgba(9,27,51,.78); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); border-bottom: 1px solid rgba(255,255,255,.06); opacity: 0; transition: opacity .3s ease; }
+  .scrolled .nav-bg { opacity: 1; }
+
+  /* hero demo */
+  .tool { background: linear-gradient(180deg, rgba(15,37,71,.92), rgba(12,30,58,.92)); border: 1px solid rgba(255,255,255,.08); border-radius: 24px; box-shadow: var(--shadow-float); }
+  .post { background: #fff; color: #18263C; border-radius: 16px; box-shadow: 0 1px 2px rgba(3,10,22,.2), 0 12px 32px -12px rgba(3,10,22,.5); }
+  .tone { position: relative; font-size: 13.5px; font-weight: 500; color: var(--mist); padding: 8px 14px; border-radius: 999px; cursor: pointer; transition: transform .3s var(--spring); }
+  .tone::before { content: ""; position: absolute; inset: 0; border-radius: inherit; background: rgba(255,255,255,.06); opacity: 0; transition: opacity .2s ease; }
+  .tone:hover::before { opacity: 1; }
+  .tone:hover { color: #fff; }
+  .tone:active { transform: scale(.95); }
+  .tone:focus-visible { outline: 2px solid var(--teal); outline-offset: 2px; }
+  .tone[aria-checked="true"] { color: #fff; }
+  .tone[aria-checked="true"]::before { opacity: 1; background: var(--royal); box-shadow: 0 4px 12px -4px rgba(26,115,232,.8); }
+  .tone > span { position: relative; }
+
+  .post-body p { margin: 0 0 12px; }
+  .post-body p:last-child { margin-bottom: 0; }
+  .post-body .tag { color: var(--royal); font-weight: 500; }
+  .line-in { opacity: 0; transform: translateY(8px); animation: lineIn .55s var(--ease-out) forwards; }
+  @keyframes lineIn { to { opacity: 1; transform: none; } }
+  .progress { transform: scaleX(0); transform-origin: left; background: linear-gradient(90deg, var(--royal), var(--teal)); }
+  .progress.run { animation: prog .9s var(--ease-out) forwards; }
+  @keyframes prog { to { transform: scaleX(1); } }
+  .fade-swap { transition: opacity .25s ease, transform .35s var(--ease-out); }
+  .is-hidden { opacity: 0; transform: translateY(4px); pointer-events: none; }
+
+  .chip { display: inline-flex; align-items: center; gap: 6px; font-size: 12.5px; font-weight: 500; padding: 4px 10px; border-radius: 999px; line-height: 1.4; }
+
+  /* arrow motif */
+  .arc path.draw { stroke-dasharray: 260; stroke-dashoffset: 260; animation: draw 1.4s .4s var(--ease-out) forwards; }
+  @keyframes draw { to { stroke-dashoffset: 0; } }
+
+  /* steps */
+  .step-card { background: #fff; border-radius: 20px; box-shadow: var(--shadow-elev); }
+  .icon-tile { width: 56px; height: 56px; border-radius: 16px; display: grid; place-items: center; background: linear-gradient(135deg, rgba(26,115,232,.10), rgba(16,185,129,.12)); }
+
+  /* examples tabs */
+  .tab { position: relative; font-weight: 500; font-size: 15px; color: var(--slate); padding: 10px 18px; border-radius: 999px; cursor: pointer; transition: transform .3s var(--spring); }
+  .tab::before { content: ""; position: absolute; inset: 0; border-radius: inherit; background: rgba(9,27,51,.06); opacity: 0; transition: opacity .2s ease; }
+  .tab:hover::before { opacity: 1; }
+  .tab:active { transform: scale(.96); }
+  .tab:focus-visible { outline: 2px solid var(--royal); outline-offset: 2px; }
+  .tab[aria-selected="true"] { color: #fff; }
+  .tab[aria-selected="true"]::before { opacity: 1; background: var(--navy); }
+  .tab > span { position: relative; }
+  .panel-enter { animation: panelIn .5s var(--ease-out); }
+  @keyframes panelIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+  .draft-card { background: rgba(9,27,51,.035); border: 1px dashed rgba(9,27,51,.18); border-radius: 18px; }
+  .after-card { background: #fff; border-radius: 18px; box-shadow: var(--shadow-elev), 0 0 0 1px rgba(16,185,129,.25); }
+
+  /* cliché strike */
+  .cliche { position: relative; display: inline-block; padding: 10px 18px; border-radius: 999px; background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.09); color: rgba(255,255,255,.62); font-size: 15px; line-height: 1.4; }
+  .cliche::after { content: ""; position: absolute; left: 14px; right: 14px; top: 50%; height: 2px; border-radius: 2px; background: var(--teal); transform: scaleX(0); transform-origin: left; transition: transform .7s var(--ease-out); }
+  .struck .cliche::after { transform: scaleX(1); }
+
+  /* pricing */
+  .plan { border-radius: 24px; background: rgba(15,37,71,.55); border: 1px solid rgba(255,255,255,.08); }
+  .plan-pro { background: linear-gradient(180deg, #11305C, #0F2547); border: 1px solid rgba(26,115,232,.55); box-shadow: var(--shadow-float); }
+
+  /* faq */
+  .faq summary { list-style: none; cursor: pointer; }
+  .faq summary::-webkit-details-marker { display: none; }
+  .faq summary:focus-visible { outline: 2px solid var(--teal); outline-offset: 4px; border-radius: 8px; }
+  .faq summary .plus { transition: transform .4s var(--spring); }
+  .faq details[open] summary .plus { transform: rotate(45deg); }
+  .faq summary h3 { transition: opacity .2s ease; }
+  .faq summary:hover h3 { opacity: .8; }
+  .faq summary:active .plus { transform: scale(.85); }
+  .faq details[open] .answer { animation: panelIn .45s var(--ease-out); }
+
+  .footlink { color: var(--mist); font-size: 14px; border-radius: 4px; transition: opacity .2s ease; }
+  .footlink:hover { color: #fff; }
+  .footlink:active { opacity: .7; }
+  .footlink:focus-visible { outline: 2px solid var(--teal); outline-offset: 3px; }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation-duration: .01ms !important; animation-delay: 0ms !important; transition-duration: .01ms !important; }
+    html { scroll-behavior: auto; }
+  }
+</style>
+</head>
+<body class="overflow-x-hidden">
+
+<svg width="0" height="0" class="absolute" aria-hidden="true">
+  <defs>
+    <linearGradient id="brandGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#1A73E8"/><stop offset="1" stop-color="#10B981"/>
+    </linearGradient>
+  </defs>
+</svg>
+
+<!-- Nav -->
+<header id="nav" class="nav-shell fixed inset-x-0 top-0 z-50">
+  <div class="nav-bg"></div>
+  <nav class="wrap relative flex h-[80px] items-center justify-between" aria-label="Main">
+    <a href="#top" class="focusable rounded-md transition-opacity duration-200 hover:opacity-90 active:opacity-75" aria-label="Simple LinkedIn Rewriter home">
+      <img src="brand_assets/logo-transparent.png" alt="Simple LinkedIn Rewriter" class="h-10 w-auto md:h-12">
+    </a>
+    <div class="hidden items-center gap-8 md:flex">
+      <a class="navlink" href="#how"><span>How it works</span></a>
+      <a class="navlink" href="#examples"><span>Examples</span></a>
+      <a class="navlink" href="#pricing"><span>Pricing</span></a>
+      <a class="navlink" href="#faq"><span>FAQ</span></a>
+    </div>
+    <a href="#top" data-focus-demo class="btn btn-primary btn-sm">Try it free</a>
+  </nav>
+</header>
+
+<main id="top">
+
+  <!-- Hero -->
+  <section class="hero-bg grain relative overflow-hidden pt-[136px] pb-[96px] lg:pt-[168px] lg:pb-[128px]">
+    <div class="wrap relative z-10 grid grid-cols-1 items-center gap-16 lg:grid-cols-12 lg:gap-12">
+      <div class="min-w-0 lg:col-span-5">
+        <h1 class="text-[44px] sm:text-[56px] lg:text-[64px]">Write LinkedIn posts people finish reading.</h1>
+        <p class="mt-6 max-w-[34rem] text-[18px] text-mist">Paste a rough draft. Simple LinkedIn Rewriter puts your point up front, cuts the filler, and keeps it sounding like you, not like a press release.</p>
+        <div class="mt-10 flex flex-wrap items-center gap-4">
+          <a href="#demo" data-focus-demo class="btn btn-primary">Rewrite a post free</a>
+          <a href="#examples" class="btn btn-secondary">See examples</a>
+        </div>
+        <p class="mt-6 text-[14px] text-mist/80">5 free rewrites a day. No sign-up, no card.</p>
+      </div>
+
+      <!-- Live demo -->
+      <div class="relative min-w-0 lg:col-span-7" id="demo">
+        <svg class="arc pointer-events-none absolute -top-[76px] left-10 hidden h-[72px] w-[280px] sm:block" viewBox="0 0 280 72" fill="none" aria-hidden="true">
+          <path class="draw" d="M6 66 C 70 0, 200 -6, 262 50" stroke="url(#brandGrad)" stroke-width="6" stroke-linecap="round"/>
+          <path d="M240 50 L264 52 L260 28" stroke="#10B981" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+
+        <div class="tool relative p-4 sm:p-6">
+          <div class="flex flex-wrap items-center justify-between gap-3">
+            <div role="radiogroup" aria-label="Tone" class="flex flex-wrap gap-1 rounded-full bg-navy/60 p-1" id="tones">
+              <button type="button" role="radio" aria-checked="true" class="tone" data-tone="professional"><span>Professional</span></button>
+              <button type="button" role="radio" aria-checked="false" class="tone" data-tone="concise"><span>Concise</span></button>
+              <button type="button" role="radio" aria-checked="false" class="tone" data-tone="story"><span>Storytelling</span></button>
+            </div>
+            <span id="state-chip" class="chip bg-white/5 text-mist">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 1 1 3 3L7 19l-4 1 1-4Z"/></svg>
+              <span id="state-label">Sample draft</span>
+            </span>
+          </div>
+
+          <article class="post mt-4 overflow-hidden sm:mt-5" aria-live="polite">
+            <div class="h-1 w-full bg-slate-100"><div id="progress" class="progress h-full w-full"></div></div>
+            <div class="p-5 sm:p-6">
+              <div class="flex items-center gap-3">
+                <div class="grid h-11 w-11 shrink-0 place-items-center rounded-full font-display text-[15px] font-semibold text-white" style="background: linear-gradient(135deg, #1A73E8, #10B981);">MC</div>
+                <div class="min-w-0">
+                  <p class="text-[15px] font-semibold leading-tight text-[#18263C]">Maya Chen</p>
+                  <p class="truncate text-[13px] leading-tight text-[#66758C]">Senior Product Designer at Northwind Health</p>
+                </div>
+              </div>
+              <div id="post-body" class="post-body mt-4 min-h-[280px] text-[15px] leading-[1.6] sm:min-h-[300px]"></div>
+            </div>
+          </article>
+
+          <div class="mt-4 flex flex-wrap items-center justify-between gap-3 sm:mt-5">
+            <div class="flex flex-wrap gap-2 text-[13px]">
+              <span class="chip bg-white/5 text-mist"><span id="wc">0</span>&nbsp;words</span>
+              <span class="chip bg-white/5 text-mist"><span id="hc">0</span>&nbsp;hashtags</span>
+              <span id="delta" class="chip fade-swap is-hidden bg-teal/15 text-teal"></span>
+            </div>
+            <div class="ml-auto flex items-center gap-2">
+              <button type="button" id="copy" class="btn btn-secondary btn-sm fade-swap is-hidden" aria-hidden="true" tabindex="-1">Copy</button>
+              <button type="button" id="rewrite" class="btn btn-primary btn-sm">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a9 9 0 0 1-15.5 6.2L3 16"/><path d="M3 12a9 9 0 0 1 15.5-6.2L21 8"/><path d="M21 3v5h-5"/><path d="M3 21v-5h5"/></svg>
+                <span id="rewrite-label">Rewrite</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- How it works -->
+  <section id="how" class="light-bg section relative text-ink">
+    <div class="wrap">
+      <div class="max-w-[40rem]">
+        <h2 class="text-[36px] sm:text-[48px]">Three steps, about ten seconds.</h2>
+        <p class="mt-5 text-[18px] text-slate">No prompts to learn and no settings to tune. You bring the draft; it comes back ready to post.</p>
+      </div>
+
+      <ol class="relative mt-16 grid gap-6 md:grid-cols-3 md:gap-8">
+        <li class="step-card relative p-8">
+          <div class="flex items-center justify-between">
+            <div class="icon-tile">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="url(#brandGrad)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16.5 3.5a2.1 2.1 0 1 1 3 3L7 19l-4 1 1-4Z"/></svg>
+            </div>
+            <span class="font-display text-[44px] font-bold leading-none text-ink/10">1</span>
+          </div>
+          <h3 class="mt-8 text-[22px]">Paste your draft</h3>
+          <p class="mt-3 text-[16px] text-slate">Bullet points, a rambling paragraph, or a post you already wrote. Anything up to 3,000 characters.</p>
+        </li>
+        <li class="step-card relative p-8">
+          <div class="flex items-center justify-between">
+            <div class="icon-tile">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="url(#brandGrad)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a9 9 0 0 1-15.5 6.2L3 16"/><path d="M3 12a9 9 0 0 1 15.5-6.2L21 8"/><path d="M21 3v5h-5"/><path d="M3 21v-5h5"/></svg>
+            </div>
+            <span class="font-display text-[44px] font-bold leading-none text-ink/10">2</span>
+          </div>
+          <h3 class="mt-8 text-[22px]">Pick a tone</h3>
+          <p class="mt-3 text-[16px] text-slate">Professional, concise, or storytelling. Switch between them and compare before you commit.</p>
+        </li>
+        <li class="step-card relative p-8">
+          <div class="flex items-center justify-between">
+            <div class="icon-tile">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="url(#brandGrad)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9.5"/><path d="m8 12.5 2.8 2.8L16.5 9.5"/></svg>
+            </div>
+            <span class="font-display text-[44px] font-bold leading-none text-ink/10">3</span>
+          </div>
+          <h3 class="mt-8 text-[22px]">Copy and post</h3>
+          <p class="mt-3 text-[16px] text-slate">One click copies it with LinkedIn-friendly line breaks intact. Edit anything you like first.</p>
+        </li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- Examples -->
+  <section id="examples" class="light-bg section relative pt-0 text-ink lg:pt-0">
+    <div class="wrap">
+      <div class="flex flex-col gap-8 lg:flex-row lg:items-end lg:justify-between">
+        <div class="max-w-[38rem]">
+          <h2 class="text-[36px] sm:text-[48px]">Same facts. Better post.</h2>
+          <p class="mt-5 text-[18px] text-slate">Real kinds of posts people struggle with, before and after. Nothing is invented: every detail in the rewrite comes from the draft.</p>
+        </div>
+        <div role="tablist" aria-label="Example posts" class="flex flex-wrap gap-2" id="ex-tabs">
+          <button role="tab" aria-selected="true" aria-controls="ex-panel" class="tab" data-ex="0"><span>Lesson learned</span></button>
+          <button role="tab" aria-selected="false" aria-controls="ex-panel" class="tab" data-ex="1" tabindex="-1"><span>Hiring</span></button>
+          <button role="tab" aria-selected="false" aria-controls="ex-panel" class="tab" data-ex="2" tabindex="-1"><span>Project launch</span></button>
+        </div>
+      </div>
+
+      <div id="ex-panel" role="tabpanel" class="mt-12 grid items-stretch gap-6 lg:grid-cols-[1fr_auto_1fr] lg:gap-8">
+        <div class="draft-card p-6 sm:p-8">
+          <p class="text-[14px] font-medium text-slate">Your draft</p>
+          <div id="ex-before" class="mt-4 space-y-3 text-[15.5px] leading-[1.65] text-slate"></div>
+        </div>
+        <div class="flex items-center justify-center" aria-hidden="true">
+          <svg class="h-12 w-12 rotate-90 lg:rotate-0" viewBox="0 0 48 48" fill="none">
+            <path d="M8 30 C 14 14, 30 10, 38 20" stroke="url(#brandGrad)" stroke-width="4" stroke-linecap="round"/>
+            <path d="M32 14 L42 24 L30 26 Z" fill="#10B981"/>
+          </svg>
+        </div>
+        <div class="after-card p-6 sm:p-8">
+          <p class="flex items-center gap-2 text-[14px] font-medium text-teal">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9.5"/><path d="m8 12.5 2.8 2.8L16.5 9.5"/></svg>
+            Rewritten
+          </p>
+          <div id="ex-after" class="mt-4 space-y-3 text-[15.5px] leading-[1.65] text-[#18263C]"></div>
+        </div>
+      </div>
+      <ul id="ex-notes" class="mt-8 flex flex-wrap gap-3 lg:justify-end"></ul>
+    </div>
+  </section>
+
+  <!-- Cliches -->
+  <section class="dark-bg grain section relative overflow-hidden">
+    <div class="wrap relative z-10 grid grid-cols-1 gap-16 lg:grid-cols-12 lg:items-center">
+      <div class="lg:col-span-5">
+        <h2 class="text-[36px] sm:text-[48px]">It cuts the lines everyone scrolls past.</h2>
+        <p class="mt-5 text-[18px] text-mist">Your names, numbers, and opinions stay. The stock phrases, hashtag pile-ups, and engagement bait go.</p>
+      </div>
+      <ul id="cliches" class="flex flex-wrap gap-3 lg:col-span-7" aria-label="Examples of phrases that get removed">
+        <li class="cliche">I'm humbled and honored to announce</li>
+        <li class="cliche">Agree?</li>
+        <li class="cliche">Let that sink in.</li>
+        <li class="cliche">#Blessed #Grateful #Motivation</li>
+        <li class="cliche">In today's fast-paced world</li>
+        <li class="cliche">I'm thrilled to share</li>
+        <li class="cliche">Thoughts? 👇</li>
+        <li class="cliche">This is a game-changer</li>
+        <li class="cliche">I couldn't have done it without each and every one of you</li>
+        <li class="cliche">Hot take:</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- Pricing -->
+  <section id="pricing" class="dark-bg section relative pt-0 lg:pt-0">
+    <div class="wrap">
+      <div class="mx-auto max-w-[36rem] text-center">
+        <h2 class="text-[36px] sm:text-[48px]">Free to start. Cheap to keep.</h2>
+        <p class="mt-5 text-[18px] text-mist">Most people post a few times a week. The free plan covers that.</p>
+      </div>
+      <div class="mx-auto mt-16 grid max-w-[880px] gap-6 md:grid-cols-2 md:items-center">
+        <div class="plan p-8 sm:p-10">
+          <h3 class="text-[22px]">Free</h3>
+          <p class="mt-4 flex items-baseline gap-2"><span class="font-display text-[48px] font-bold leading-none tracking-[-0.03em]">$0</span></p>
+          <p class="mt-3 text-[15px] text-mist">For posting now and then.</p>
+          <ul class="mt-8 space-y-3 text-[15px]">
+            <li class="flex gap-3"><svg class="mt-1 shrink-0" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#10B981" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>5 rewrites a day</li>
+            <li class="flex gap-3"><svg class="mt-1 shrink-0" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#10B981" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>All three tones</li>
+            <li class="flex gap-3"><svg class="mt-1 shrink-0" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#10B981" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>No account needed</li>
+          </ul>
+          <a href="#demo" data-focus-demo class="btn btn-secondary mt-10 w-full">Start free</a>
+        </div>
+        <div class="plan plan-pro relative p-8 sm:p-10">
+          <span class="chip absolute right-6 top-6 bg-teal/15 text-teal">Most popular</span>
+          <h3 class="text-[22px]">Pro</h3>
+          <p class="mt-4 flex items-baseline gap-2"><span class="font-display text-[48px] font-bold leading-none tracking-[-0.03em]">$9</span><span class="text-mist">/ month</span></p>
+          <p class="mt-3 text-[15px] text-mist">For people who post every week.</p>
+          <ul class="mt-8 space-y-3 text-[15px]">
+            <li class="flex gap-3"><svg class="mt-1 shrink-0" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#10B981" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>Unlimited rewrites</li>
+            <li class="flex gap-3"><svg class="mt-1 shrink-0" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#10B981" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>Voice profile trained on your past posts</li>
+            <li class="flex gap-3"><svg class="mt-1 shrink-0" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#10B981" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>Rewrite history and saved drafts</li>
+            <li class="flex gap-3"><svg class="mt-1 shrink-0" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#10B981" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>Headline and About section rewrites</li>
+          </ul>
+          <a href="#pricing" class="btn btn-primary mt-10 w-full">Get Pro</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section id="faq" class="light-bg section relative text-ink">
+    <div class="wrap grid gap-12 lg:grid-cols-12">
+      <div class="lg:col-span-4">
+        <h2 class="text-[36px] sm:text-[48px]">Questions</h2>
+        <p class="mt-5 text-[18px] text-slate">Something else? Email <a href="mailto:hello@example.com" class="focusable rounded font-medium text-royal underline decoration-royal/30 underline-offset-4 transition-opacity hover:opacity-80 active:opacity-60">hello@example.com</a>.</p>
+      </div>
+      <div class="faq divide-y divide-ink/10 border-y border-ink/10 lg:col-span-8">
+        <details class="group py-6" open>
+          <summary class="flex items-center justify-between gap-6">
+            <h3 class="text-[19px]">Will it still sound like me?</h3>
+            <svg class="plus shrink-0" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1A73E8" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+          </summary>
+          <p class="answer mt-3 max-w-[40rem] text-[16px] text-slate">Yes. It keeps your words where they work and only changes structure and filler. On Pro, it also learns from posts you've already published.</p>
+        </details>
+        <details class="group py-6">
+          <summary class="flex items-center justify-between gap-6">
+            <h3 class="text-[19px]">Does it make things up?</h3>
+            <svg class="plus shrink-0" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1A73E8" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+          </summary>
+          <p class="answer mt-3 max-w-[40rem] text-[16px] text-slate">No. It won't add numbers, names, or claims that aren't in your draft. If something is unclear, it leaves it for you to fill in.</p>
+        </details>
+        <details class="group py-6">
+          <summary class="flex items-center justify-between gap-6">
+            <h3 class="text-[19px]">Do you post to LinkedIn for me?</h3>
+            <svg class="plus shrink-0" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1A73E8" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+          </summary>
+          <p class="answer mt-3 max-w-[40rem] text-[16px] text-slate">No, and we never ask for your LinkedIn login. You copy the rewrite and post it yourself.</p>
+        </details>
+        <details class="group py-6">
+          <summary class="flex items-center justify-between gap-6">
+            <h3 class="text-[19px]">What happens to my drafts?</h3>
+            <svg class="plus shrink-0" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1A73E8" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+          </summary>
+          <p class="answer mt-3 max-w-[40rem] text-[16px] text-slate">Free rewrites aren't stored. Pro saves your history so you can come back to it, and you can delete it anytime.</p>
+        </details>
+        <details class="group py-6">
+          <summary class="flex items-center justify-between gap-6">
+            <h3 class="text-[19px]">Can I cancel Pro anytime?</h3>
+            <svg class="plus shrink-0" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1A73E8" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+          </summary>
+          <p class="answer mt-3 max-w-[40rem] text-[16px] text-slate">Yes, from your account page in two clicks. You keep Pro until the end of the month you paid for.</p>
+        </details>
+      </div>
+    </div>
+  </section>
+
+  <!-- Final CTA -->
+  <section class="hero-bg grain section relative overflow-hidden">
+    <div class="wrap relative z-10 flex flex-col items-center text-center">
+      <img src="brand_assets/logo-icon.png" alt="" class="h-16 w-auto">
+      <h2 class="mt-8 max-w-[44rem] text-[40px] sm:text-[56px]">Your next post is already half written.</h2>
+      <p class="mt-5 max-w-[32rem] text-[18px] text-mist">Paste it in and see the other half.</p>
+      <a href="#demo" data-focus-demo class="btn btn-primary mt-10">Rewrite a post free</a>
+    </div>
+  </section>
+</main>
+
+<footer class="border-t border-white/5 bg-navy">
+  <div class="wrap flex flex-col items-start justify-between gap-6 py-10 md:flex-row md:items-center">
+    <img src="brand_assets/logo-transparent.png" alt="Simple LinkedIn Rewriter" class="h-8 w-auto">
+    <nav class="flex flex-wrap gap-x-8 gap-y-3" aria-label="Footer">
+      <a class="footlink" href="#how">How it works</a>
+      <a class="footlink" href="#pricing">Pricing</a>
+      <a class="footlink" href="#faq">FAQ</a>
+      <a class="footlink" href="#">Privacy</a>
+      <a class="footlink" href="#">Terms</a>
+    </nav>
+    <p class="text-[13px] text-mist/70">© 2026 Simple LinkedIn Rewriter. Not affiliated with LinkedIn.</p>
+  </div>
+</footer>
+
+<script>
+  // ---------- Nav background on scroll ----------
+  const nav = document.getElementById('nav');
+  const onScroll = () => nav.classList.toggle('scrolled', window.scrollY > 12);
+  onScroll(); window.addEventListener('scroll', onScroll, { passive: true });
+
+  // ---------- Hero demo ----------
+  const DRAFT = `I am extremely humbled and honored to announce that after a long and challenging process, I have officially accepted a new position as Senior Product Designer at Northwind Health!! 🎉🎉
+
+I want to take a moment to thank each and every person who has supported me on this incredible journey. I couldn't have done it without you.
+
+Excited for this next chapter and can't wait to see what the future holds!
+
+#NewJob #Blessed #Grateful #Design #UX #Career #Motivation #Hired`;
+
+  const REWRITES = {
+    professional: `I've joined Northwind Health as Senior Product Designer.
+
+I'll be working on the patient app, where people book care, check results, and message their doctors. The goal: fewer taps between a worried patient and an answer.
+
+Thank you to the mentors and former teammates who reviewed my portfolio and ran practice interviews with me.
+
+Designing in healthcare too? I'd like to compare notes.
+
+#ProductDesign #HealthTech`,
+    concise: `New role: Senior Product Designer at Northwind Health.
+
+I'll be redesigning the patient app so people get answers in fewer taps.
+
+Thanks to everyone who reviewed my portfolio along the way.
+
+#ProductDesign`,
+    story: `Six months ago I froze in a portfolio review and couldn't explain my own case study.
+
+On Monday I start as Senior Product Designer at Northwind Health.
+
+What changed: I practiced out loud every week with people generous enough to interrupt me. That's the whole secret.
+
+Now I get to work on the app patients use to book care and read their results. I can't think of better work.
+
+#ProductDesign #HealthTech`,
+  };
+
+  const body = document.getElementById('post-body');
+  const wc = document.getElementById('wc'), hc = document.getElementById('hc');
+  const delta = document.getElementById('delta');
+  const btn = document.getElementById('rewrite'), btnLabel = document.getElementById('rewrite-label');
+  const copyBtn = document.getElementById('copy');
+  const progress = document.getElementById('progress');
+  const stateChip = document.getElementById('state-chip'), stateLabel = document.getElementById('state-label');
+  let tone = 'professional', rewritten = false, busy = false;
+
+  const esc = s => s.replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+  const words = t => t.replace(/#\w+/g, '').split(/\s+/).filter(w => /[A-Za-z0-9]/.test(w)).length;
+  const tags = t => (t.match(/#\w+/g) || []).length;
+
+  function render(text, animate) {
+    body.innerHTML = text.split('\n\n').map((p, i) =>
+      `<p class="${animate ? 'line-in' : ''}" style="animation-delay:${i * 90}ms">${esc(p).replace(/(#\w+)/g, '<span class="tag">$1</span>')}</p>`
+    ).join('');
+    wc.textContent = words(text); hc.textContent = tags(text);
+  }
+
+  function setRewrittenUI(on) {
+    rewritten = on;
+    btnLabel.textContent = on ? 'Show draft' : 'Rewrite';
+    stateLabel.textContent = on ? 'Rewritten' : 'Sample draft';
+    stateChip.className = 'chip ' + (on ? 'bg-teal/15 text-teal' : 'bg-white/5 text-mist');
+    copyBtn.classList.toggle('is-hidden', !on);
+    copyBtn.setAttribute('aria-hidden', String(!on));
+    copyBtn.tabIndex = on ? 0 : -1;
+    if (on) {
+      const saved = words(DRAFT) - words(REWRITES[tone]);
+      delta.textContent = saved >= 5 ? `${saved} fewer words` : `Hashtags ${tags(DRAFT)} to ${tags(REWRITES[tone])}`;
+    }
+    delta.classList.toggle('is-hidden', !on);
+  }
+
+  function runRewrite() {
+    if (busy) return;
+    busy = true; btn.disabled = true; btnLabel.textContent = 'Rewriting…';
+    progress.classList.remove('run'); void progress.offsetWidth; progress.classList.add('run');
+    body.style.transition = 'opacity .25s ease'; body.style.opacity = '.25';
+    setTimeout(() => {
+      body.style.opacity = '1';
+      render(REWRITES[tone], true);
+      setRewrittenUI(true);
+      busy = false; btn.disabled = false;
+    }, 900);
+  }
+
+  btn.addEventListener('click', () => {
+    if (rewritten) {
+      progress.classList.remove('run');
+      render(DRAFT, true); setRewrittenUI(false);
+    } else runRewrite();
+  });
+
+  document.querySelectorAll('.tone').forEach(t => t.addEventListener('click', () => {
+    if (busy || t.dataset.tone === tone) return;
+    document.querySelectorAll('.tone').forEach(x => x.setAttribute('aria-checked', String(x === t)));
+    tone = t.dataset.tone;
+    if (rewritten) { rewritten = false; runRewrite(); }
+  }));
+
+  copyBtn.addEventListener('click', async () => {
+    try { await navigator.clipboard.writeText(REWRITES[tone]); copyBtn.textContent = 'Copied'; }
+    catch { copyBtn.textContent = 'Select and copy'; }
+    setTimeout(() => (copyBtn.textContent = 'Copy'), 1600);
+  });
+
+  document.querySelectorAll('[data-focus-demo]').forEach(a => a.addEventListener('click', () => {
+    setTimeout(() => btn.focus({ preventScroll: true }), 500);
+  }));
+
+  render(DRAFT, false);
+
+  // ---------- Examples ----------
+  const EXAMPLES = [
+    {
+      before: [
+        "So I wanted to share something that happened this week that really made me think. We had a big launch and honestly things didn't go as planned at all.",
+        "Our onboarding flow broke for about 2 hours and we lost a lot of signups. But you know what? Failure is just a stepping stone to success.",
+        "Lesson: always test on real devices!! Agree? 👇 #Leadership #Startups #Growth #Failure #Lessons",
+      ],
+      after: [
+        "Our onboarding flow broke for 2 hours on launch day. We lost a lot of signups.",
+        "The cause: we tested on simulators, not real phones. The bug only showed up on older Android devices.",
+        "We now run every release on five physical devices before shipping. Cheap fix, expensive lesson.",
+        "#Startups",
+      ],
+      notes: ['The point is in line one', 'Vague moral replaced with the actual fix', '5 hashtags down to 1'],
+    },
+    {
+      before: [
+        "🚀 WE'RE HIRING!!! 🚀 Are you a rockstar ninja developer who is passionate about building the future?? Do you thrive in a fast-paced environment?",
+        "Our amazing team at Brightline is looking for a Backend Engineer to join our family! Competitive salary and great culture.",
+        "DM me or apply below!! Please share with your network 🙏 #Hiring #Jobs #Tech #Developer #OpenToWork",
+      ],
+      after: [
+        "Brightline is hiring a Backend Engineer.",
+        "You'd own the payments API that 400 small businesses use to get paid. We work in Go and Postgres, remote across EU time zones.",
+        "If that sounds like your kind of problem, the job post is in the comments, or message me directly.",
+        "#Hiring #Golang",
+      ],
+      notes: ['Role and company up front', 'Clichés swapped for real details', 'One clear next step'],
+    },
+    {
+      before: [
+        "After many months of hard work, late nights, and countless cups of coffee ☕, I am beyond thrilled to finally share what our team has been working on!!",
+        "Introducing Ledgerly, a game-changing new way for freelancers to manage their invoices. It's going to revolutionize the industry.",
+        "Check it out and let me know your thoughts! #Launch #Startup #Fintech #Freelance #Innovation",
+      ],
+      after: [
+        "We just launched Ledgerly: invoicing for freelancers that sends payment reminders for you.",
+        "We built it after watching our own freelance friends spend Fridays chasing late payments.",
+        "It's free for your first 10 invoices. I'd love feedback from anyone who bills clients.",
+        "#Freelance #Fintech",
+      ],
+      notes: ['What it does, in one sentence', 'Hype replaced with why it exists', 'Specific ask for feedback'],
+    },
+  ];
+  const exBefore = document.getElementById('ex-before'), exAfter = document.getElementById('ex-after');
+  const exNotes = document.getElementById('ex-notes'), exPanel = document.getElementById('ex-panel');
+  const tabs = [...document.querySelectorAll('#ex-tabs .tab')];
+
+  function showExample(i, animate) {
+    const ex = EXAMPLES[i];
+    exBefore.innerHTML = ex.before.map(p => `<p>${esc(p)}</p>`).join('');
+    exAfter.innerHTML = ex.after.map(p => `<p>${esc(p).replace(/(#\w+)/g, '<span class="font-medium text-royal">$1</span>')}</p>`).join('');
+    exNotes.innerHTML = ex.notes.map(n =>
+      `<li class="chip bg-white px-4 py-2 text-[14px] text-ink" style="box-shadow:var(--shadow-elev)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#10B981" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>${esc(n)}</li>`
+    ).join('');
+    tabs.forEach((t, j) => { t.setAttribute('aria-selected', String(j === i)); t.tabIndex = j === i ? 0 : -1; });
+    if (animate) { exPanel.classList.remove('panel-enter'); void exPanel.offsetWidth; exPanel.classList.add('panel-enter'); }
+  }
+  tabs.forEach((t, i) => {
+    t.addEventListener('click', () => showExample(i, true));
+    t.addEventListener('keydown', e => {
+      if (e.key !== 'ArrowRight' && e.key !== 'ArrowLeft') return;
+      const n = (i + (e.key === 'ArrowRight' ? 1 : tabs.length - 1)) % tabs.length;
+      showExample(n, true); tabs[n].focus();
+    });
+  });
+  showExample(0, false);
+
+  // ---------- Strike clichés when visible ----------
+  const cl = document.getElementById('cliches');
+  [...cl.children].forEach((li, i) => li.style.setProperty('--d', i));
+  cl.querySelectorAll('.cliche').forEach((li, i) => li.style.cssText += `;transition-delay:${i * 60}ms`);
+  const style = document.createElement('style');
+  style.textContent = [...cl.children].map((_, i) => `#cliches .cliche:nth-child(${i + 1})::after{transition-delay:${i * 90}ms}`).join('');
+  document.head.appendChild(style);
+  if ('IntersectionObserver' in window) {
+    new IntersectionObserver((entries, obs) => entries.forEach(e => {
+      if (e.isIntersecting) { cl.classList.add('struck'); obs.disconnect(); }
+    }), { threshold: 0.4 }).observe(cl);
+  } else cl.classList.add('struck');
+</script>
+</body>
+</html>
