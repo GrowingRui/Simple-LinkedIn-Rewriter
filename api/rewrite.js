@@ -33,7 +33,7 @@ Rules:
 - Added material must be general insight, not new facts about the author: never invent names, numbers, employers, dates, results or events, and never claim the author did, plans or tried something the draft does not say.
 - No questions anywhere in the post: every sentence is a statement, and no sentence ends with a question mark. Rephrase any question from the draft as a statement. End on a clear statement, takeaway or call to action instead of asking readers something.
 - Cut clichés and filler: "humbled and honored", "thrilled to share", "let that sink in", "game-changer", "in today's fast-paced world", "couldn't have done it without you", "incredible journey", "next chapter", engagement bait.
-- Short paragraphs of 1 to 3 sentences, separated by one blank line.
+- Short paragraphs of 1 to 3 sentences, separated by one blank line. Never write the whole post as a single block.
 - At most 3 relevant hashtags, on the last line. None if the draft has none and none fit naturally.
 - At most one emoji, and only if the draft used emoji.
 - Plain text only: no markdown, no bold, no headings, no quotes around the post.
@@ -43,7 +43,7 @@ Rules:
 const TONES = {
   professional: 'Tone: professional. Clear, confident and warm. Lead with what happened, then why it matters, then a professional insight or takeaway, and a brief thank-you if the draft has one.',
   concise: 'Tone: concise. The shortest polished version that keeps the key facts: under 40 words before the hashtags, in 1 or 2 short paragraphs. Drop generic thank-yous and sign-offs unless they name someone. For a one-line draft, concise still means a professional rewrite, not a copy.',
-  story: 'Tone: storytelling. Open with a concrete moment or detail that is in the draft, then build to the main point and close with the lesson it holds. Use only events from the draft; if it has no story to tell, keep the narrative light rather than inventing one.',
+  story: 'Tone: storytelling. Open with a concrete moment or detail that is in the draft, then build to the main point and close with the lesson it holds. Use only events from the draft; if it has no story to tell, keep the narrative light rather than inventing one. Never describe steps, habits or changes the author made unless the draft says so; give advice as general insight, not as something the author did.',
 };
 
 const RETRY_NOTES = {
@@ -55,10 +55,11 @@ const hasQuestion = s => /[?？¿]/.test(s);
 
 // Last resort if the model still asks something: drop the questions, keep the statements.
 const dropQuestions = s => s
-  .split(/\n{2,}/)
-  .map(p => p.split(/(?<=[.!?？])\s+/).filter(x => !hasQuestion(x)).join(' ').trim())
-  .filter(Boolean)
-  .join('\n\n');
+  .split('\n')
+  .map(line => line.split(/(?<=[.!?？])[ \t]+/).filter(x => !hasQuestion(x)).join(' ').trim())
+  .join('\n')
+  .replace(/\n{3,}/g, '\n\n')
+  .trim();
 
 async function callProvider(p, text, tone, retry) {
   const res = await fetch(p.url, {
@@ -90,7 +91,9 @@ function clean(s) {
     .replace(/[ \t]+$/gm, '')
     .replace(/\n{3,}/g, '\n\n')
     .trim()
-    .replace(/^"([\s\S]*)"$/, '$1');
+    .replace(/^"([\s\S]*)"$/, '$1')
+    // hashtags glued to the last sentence go on their own line
+    .replace(/([.!])[ \t]+((?:#[\p{L}\p{N}_]+[ \t]*)+)$/u, '$1\n\n$2');
 }
 
 // True when the model handed the draft back with only case, spacing or punctuation changes.
