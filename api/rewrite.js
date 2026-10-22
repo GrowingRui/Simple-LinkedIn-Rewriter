@@ -28,9 +28,11 @@ Rules:
 - Put the main point in the first line. No warm-up.
 - Raise the writing to a professional standard: fix grammar, replace casual or vague words with precise ones, and make it read like a thoughtful professional wrote it.
 - Reframe negative, blunt or self-critical statements (for example "I am lazy") into honest, constructive language a professional audience would respect, such as describing a struggle with motivation. Keep the real meaning; don't turn it into a success story.
-- If the draft is only a sentence or two, develop it into a short post of 2 to 4 short paragraphs: the point, a brief reflection on why it matters or what it's like, and a specific question that invites others to share their experience.
-- Keep every fact, name, number and opinion from the draft. Never invent concrete details: no names, numbers, employers, dates, results or events that are not in the draft. Never claim the author did, plans, tried or experienced something the draft does not say, including habits, strategies, consequences or who supported them. Added reflection must be a general observation, not a new claim about the author.
-- Cut clichés and filler: "humbled and honored", "thrilled to share", "let that sink in", "game-changer", "in today's fast-paced world", "couldn't have done it without you", "incredible journey", "next chapter", "Agree?", "Thoughts?", engagement bait.
+- Expand on the draft where it helps: add relevant context, professional insight or a takeaway that supports the author's point, written from a professional perspective. If the draft is only a sentence or two, develop it into a post of 2 to 4 short paragraphs.
+- Preserve the author's original meaning and intent. Keep every fact, name, number and opinion from the draft.
+- Added material must be general insight, not new facts about the author: never invent names, numbers, employers, dates, results or events, and never claim the author did, plans or tried something the draft does not say.
+- No questions anywhere in the post: every sentence is a statement, and no sentence ends with a question mark. Rephrase any question from the draft as a statement. End on a clear statement, takeaway or call to action instead of asking readers something.
+- Cut clichés and filler: "humbled and honored", "thrilled to share", "let that sink in", "game-changer", "in today's fast-paced world", "couldn't have done it without you", "incredible journey", "next chapter", engagement bait.
 - Short paragraphs of 1 to 3 sentences, separated by one blank line.
 - At most 3 relevant hashtags, on the last line. None if the draft has none and none fit naturally.
 - At most one emoji, and only if the draft used emoji.
@@ -39,14 +41,26 @@ Rules:
 - Output only the rewritten post, nothing before or after it.`;
 
 const TONES = {
-  professional: 'Tone: professional. Clear, confident and warm. Lead with what happened, then why it matters, then a brief thank-you or invitation if the draft has one.',
+  professional: 'Tone: professional. Clear, confident and warm. Lead with what happened, then why it matters, then a professional insight or takeaway, and a brief thank-you if the draft has one.',
   concise: 'Tone: concise. The shortest polished version that keeps the key facts: under 40 words before the hashtags, in 1 or 2 short paragraphs. Drop generic thank-yous and sign-offs unless they name someone. For a one-line draft, concise still means a professional rewrite, not a copy.',
-  story: 'Tone: storytelling. Open with a concrete moment or detail that is in the draft, then build to the main point. Use only details from the draft; if it has no story to tell, keep the narrative light rather than inventing one.',
+  story: 'Tone: storytelling. Open with a concrete moment or detail that is in the draft, then build to the main point and close with the lesson it holds. Use only events from the draft; if it has no story to tell, keep the narrative light rather than inventing one.',
 };
 
-const RETRY_NOTE = 'Your previous answer was almost identical to the draft. Rewrite it properly this time: professional wording, the point first, and a fuller post if the draft is short.';
+const RETRY_NOTES = {
+  same: 'Your previous answer was almost identical to the draft. Rewrite it properly this time: professional wording, the point first, and a fuller post if the draft is short.',
+  question: 'Your previous answer contained a question. Write the post again with no questions at all: only statements, and no question marks.',
+};
 
-async function callProvider(p, text, tone, retry = false) {
+const hasQuestion = s => /[?？¿]/.test(s);
+
+// Last resort if the model still asks something: drop the questions, keep the statements.
+const dropQuestions = s => s
+  .split(/\n{2,}/)
+  .map(p => p.split(/(?<=[.!?？])\s+/).filter(x => !hasQuestion(x)).join(' ').trim())
+  .filter(Boolean)
+  .join('\n\n');
+
+async function callProvider(p, text, tone, retry) {
   const res = await fetch(p.url, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${p.key()}` },
@@ -54,7 +68,7 @@ async function callProvider(p, text, tone, retry = false) {
       model: p.model(),
       temperature: retry ? 0.8 : 0.6,
       messages: [
-        { role: 'system', content: `${RULES}\n\n${TONES[tone]}${retry ? `\n\n${RETRY_NOTE}` : ''}` },
+        { role: 'system', content: `${RULES}\n\n${TONES[tone]}${retry ? `\n\n${RETRY_NOTES[retry]}` : ''}` },
         { role: 'user', content: `<draft>\n${text}\n</draft>` },
       ],
       ...p.extra,
@@ -106,7 +120,9 @@ export default async function handler(req, res) {
   for (const p of available) {
     try {
       let out = await callProvider(p, draft, tone);
-      if (same(out, draft)) out = await callProvider(p, draft, tone, true);
+      const problem = same(out, draft) ? 'same' : hasQuestion(out) ? 'question' : null;
+      if (problem) out = await callProvider(p, draft, tone, problem);
+      if (hasQuestion(out)) out = dropQuestions(out) || out;
       return res.status(200).json({ text: out });
     } catch (err) {
       console.error(err.message);
