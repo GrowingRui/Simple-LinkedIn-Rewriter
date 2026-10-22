@@ -633,7 +633,7 @@ Excited for this next chapter and can't wait to see what the future holds!
     if (!rewritten) return runRewrite();
     progress.classList.remove('done');
     setRewrittenUI(false);
-    draft.focus();
+    if (draft.value !== DRAFT) draft.focus(); // focusing would clear the sample they just rewrote
   });
 
   const tones = [...document.querySelectorAll('.tone')];
@@ -646,6 +646,9 @@ Excited for this next chapter and can't wait to see what the future holds!
     if (rewritten && !(await runRewrite())) selectTone(prev);
   }));
 
+  // The sample post works like a placeholder: it clears on focus and comes back if the box is left empty.
+  draft.addEventListener('focus', () => { if (draft.value === DRAFT) { draft.value = ''; counts(''); } });
+  draft.addEventListener('blur', () => { if (!draft.value.trim()) { draft.value = DRAFT; counts(DRAFT); } });
   draft.addEventListener('input', () => { counts(draft.value); showError(''); });
   draft.addEventListener('keydown', e => {
     if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) { e.preventDefault(); runRewrite(); }
