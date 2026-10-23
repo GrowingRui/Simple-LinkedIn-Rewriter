@@ -65,6 +65,16 @@ h1 { letter-spacing: -0.03em; line-height: 1.05; font-weight: 700; }
 .footlink:focus-visible { outline: 2px solid var(--teal); outline-offset: 3px; }
 .footlink[aria-current="page"] { color: #fff; }
 
+/* page transitions, matching the home page; the logo holds its place */
+@media (prefers-reduced-motion: no-preference) {
+  @view-transition { navigation: auto; }
+  ::view-transition-old(root) { animation: vtOut .26s var(--ease-out) both; }
+  ::view-transition-new(root) { animation: vtIn .55s var(--ease-out) both; }
+}
+@keyframes vtOut { to { opacity: 0; transform: translateY(-10px); } }
+@keyframes vtIn { from { opacity: 0; transform: translateY(14px); } }
+.legal-head nav > a:first-child img { view-transition-name: brand; }
+
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { transition-duration: .01ms !important; }
 }

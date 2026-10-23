@@ -31,6 +31,14 @@
     document.head.appendChild(s);
   }
 </script>
+<script>
+  // Keep the hero hidden only while the GSAP intro is about to play it in (assets/motion.js).
+  // If GSAP hasn't arrived after 3 seconds, show the page as is.
+  if (matchMedia('(prefers-reduced-motion: no-preference)').matches) {
+    document.documentElement.classList.add('motion');
+    setTimeout(() => { if (!window.gsap) document.documentElement.classList.remove('motion'); }, 3000);
+  }
+</script>
 <style>
   :root {
     --navy: #091B33; --navy-raised: #0F2547; --navy-line: #1D3559;
@@ -234,6 +242,20 @@
   .footlink:active { opacity: .7; }
   .footlink:focus-visible { outline: 2px solid var(--teal); outline-offset: 3px; }
 
+  /* motion layer (assets/motion.js): the hero waits hidden only while the intro is about to play */
+  .motion [data-hero-in] { visibility: hidden; }
+  @media (min-width: 1024px) { [data-hero-copy], #demo .tool { will-change: transform; } }
+
+  /* page transitions between home, privacy and terms; the logo holds its place */
+  @media (prefers-reduced-motion: no-preference) {
+    @view-transition { navigation: auto; }
+    ::view-transition-old(root) { animation: vtOut .26s var(--ease-out) both; }
+    ::view-transition-new(root) { animation: vtIn .55s var(--ease-out) both; }
+  }
+  @keyframes vtOut { to { opacity: 0; transform: translateY(-10px); } }
+  @keyframes vtIn { from { opacity: 0; transform: translateY(14px); } }
+  #nav nav > a:first-child img { view-transition-name: brand; }
+
   @media (prefers-reduced-motion: reduce) {
     *, *::before, *::after { animation-duration: .01ms !important; animation-delay: 0ms !important; transition-duration: .01ms !important; }
     html { scroll-behavior: auto; }
@@ -274,18 +296,18 @@
   <!-- Hero -->
   <section class="hero-bg grain relative overflow-hidden pt-[136px] pb-[96px] lg:pt-[168px] lg:pb-[128px]">
     <div class="wrap relative z-10 grid grid-cols-1 items-center gap-16 lg:grid-cols-12 lg:gap-12">
-      <div class="min-w-0 lg:col-span-5">
-        <h1 class="text-[44px] sm:text-[56px] lg:text-[64px]">Write LinkedIn posts people finish reading.</h1>
-        <p class="mt-6 max-w-[34rem] text-[18px] text-mist">Paste a rough draft. Simple LinkedIn Rewriter puts your point up front, cuts the filler, and keeps it sounding like you, not like a press release.</p>
-        <div class="mt-10 flex flex-wrap items-center gap-4">
+      <div class="min-w-0 lg:col-span-5" data-hero-copy>
+        <h1 class="text-[44px] sm:text-[56px] lg:text-[64px]" data-hero-in="title">Write LinkedIn posts people finish reading.</h1>
+        <p class="mt-6 max-w-[34rem] text-[18px] text-mist" data-hero-in>Paste a rough draft. Simple LinkedIn Rewriter puts your point up front, cuts the filler, and keeps it sounding like you, not like a press release.</p>
+        <div class="mt-10 flex flex-wrap items-center gap-4" data-hero-in>
           <a href="#demo" data-focus-demo class="btn btn-primary">Rewrite a post free</a>
           <a href="#examples" class="btn btn-secondary">See examples</a>
         </div>
-        <p class="mt-6 text-[14px] text-mist/80">5 free rewrites a day. No sign-up, no card.</p>
+        <p class="mt-6 text-[14px] text-mist/80" data-hero-in>5 free rewrites a day. No sign-up, no card.</p>
       </div>
 
       <!-- Live demo -->
-      <div class="relative min-w-0 lg:col-span-7" id="demo">
+      <div class="relative min-w-0 lg:col-span-7" id="demo" data-hero-in="demo">
         <svg class="arc pointer-events-none absolute -top-[76px] left-10 hidden h-[72px] w-[280px] sm:block" viewBox="0 0 280 72" fill="none" aria-hidden="true">
           <path class="draw" d="M6 66 C 70 0, 200 -6, 262 50" stroke="url(#brandGrad)" stroke-width="6" stroke-linecap="round"/>
           <path d="M240 50 L264 52 L260 28" stroke="#10B981" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
@@ -586,12 +608,12 @@
   </section>
 
   <!-- Final CTA -->
-  <section class="hero-bg grain section relative overflow-hidden">
+  <section class="hero-bg grain section relative overflow-hidden" data-final-cta>
     <div class="wrap relative z-10 flex flex-col items-center text-center">
       <img src="brand_assets/logo-icon.png" alt="" class="h-16 w-auto">
       <h2 class="mt-8 max-w-[44rem] text-[40px] sm:text-[56px]">Your next post is already half written.</h2>
       <p class="mt-5 max-w-[32rem] text-[18px] text-mist">Paste it in and see the other half.</p>
-      <a href="#demo" data-focus-demo class="btn btn-primary mt-10">Rewrite a post free</a>
+      <div class="mt-10" data-cta><a href="#demo" data-focus-demo class="btn btn-primary">Rewrite a post free</a></div>
     </div>
   </section>
 </main>
@@ -995,5 +1017,10 @@ Excited for this next chapter and can't wait to see what the future holds!
     }), { threshold: 0.4 }).observe(cl);
   } else cl.classList.add('struck');
 </script>
+<!-- Motion layer: GSAP + ScrollTrigger + SplitText (all free). Loaded last so the page works without it. -->
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.14.2/gsap.min.js"></script>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.14.2/ScrollTrigger.min.js"></script>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.14.2/SplitText.min.js"></script>
+<script defer src="assets/motion.js"></script>
 </body>
 </html>
