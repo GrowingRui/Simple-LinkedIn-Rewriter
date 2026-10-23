@@ -17,16 +17,86 @@
   // Scroll zones for reveals: elements play in inside ENTER and reset once outside AWAY (fully off screen).
   const ENTER = { start: 'top 88%', end: 'bottom 12%' };
   const AWAY = { start: 'top bottom', end: 'bottom top' };
+  const revealTargets = []; // everything the scroll reveals may hide, for the safety net below
 
   mm.add('(prefers-reduced-motion: no-preference)', ctx => {
+    smoothAnchorsInJs();
     heroIntro(ctx);
     sectionReveals();
     finalCta();
+    return () => { root.classList.remove('js-smooth-scroll'); document.removeEventListener('click', onAnchorClick); };
   });
   mm.add('(prefers-reduced-motion: reduce)', showPage);
 
   // Parallax only on large screens, where there is room for depth to read as depth.
   mm.add('(prefers-reduced-motion: no-preference) and (min-width: 1024px)', parallax);
+
+  // ---------- Keeping trigger positions true ----------
+  // Re-measure once everything (fonts, images) has loaded, and when a page comes back from the
+  // back/forward cache. Smooth scrolling is paused during each measure; see refreshInit above.
+  // ScrollTrigger's measuring cancels the browser's own "return to where you were" on Back/reload,
+  // so the page remembers the position itself and restores it before measuring.
+  const scrollKey = 'slr_scroll:' + location.pathname;
+  const navType = performance.getEntriesByType('navigation')[0]?.type;
+  ScrollTrigger.clearScrollMemory('manual');
+  addEventListener('pagehide', () => { try { sessionStorage.setItem(scrollKey, String(Math.round(scrollY))); } catch {} });
+  addEventListener('load', () => {
+    let y = 0;
+    try { y = +sessionStorage.getItem(scrollKey) || 0; } catch {}
+    if ((navType === 'back_forward' || navType === 'reload') && y && !location.hash) {
+      window.scrollTo({ top: y, behavior: 'instant' });
+    }
+    // ScrollTrigger caches the scroll position once per frame; measuring in the same instant as the
+    // jump would use the stale position. Give it two frames to see where the page now is.
+    requestAnimationFrame(() => requestAnimationFrame(() => ScrollTrigger.refresh()));
+  });
+  addEventListener('pageshow', e => { if (e.persisted) ScrollTrigger.refresh(); });
+
+  // Safety net: whatever is on screen but still invisible gets revealed, after every re-measure and
+  // whenever scrolling comes to rest. With healthy triggers this finds nothing; it exists so a
+  // browser quirk can never leave the page blank.
+  function rescue() {
+    const stuck = revealTargets.filter(el => {
+      if (+gsap.getProperty(el, 'opacity') > 0.5) return false;
+      const r = el.getBoundingClientRect();
+      return r.height > 0 && r.bottom > 0 && r.top < innerHeight;
+    });
+    if (stuck.length) {
+      gsap.fromTo(stuck, { opacity: 0, y: 24 },
+        { opacity: 1, y: 0, duration: 0.9, stagger: 0.06, overwrite: true, clearProps: 'transform' });
+    }
+  }
+  ScrollTrigger.addEventListener('refresh', () => requestAnimationFrame(rescue));
+  let resting;
+  addEventListener('scroll', () => { clearTimeout(resting); resting = setTimeout(rescue, 250); }, { passive: true });
+
+  // ---------- 0. Smooth anchor scrolling, done in JS ----------
+  // The page's CSS has `scroll-behavior: smooth` for its in-page links. ScrollTrigger measures by
+  // briefly jumping the page to the top and back; smooth scrolling turned that jump into a glide, so
+  // whenever the page wasn't at the top (e.g. after the Back button) every section was measured
+  // thousands of pixels off and stayed hidden. ScrollTrigger rewrites inline scroll-behavior itself,
+  // so a stylesheet !important rule (.js-smooth-scroll, in index.html) turns CSS smoothing off, and
+  // in-page links glide via scrollIntoView instead — same feel, without breaking measurements.
+  function onAnchorClick(e) {
+    const a = e.target.closest?.('a[href^="#"]');
+    if (!a || e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+    const id = decodeURIComponent(a.getAttribute('href').slice(1));
+    const target = id ? document.getElementById(id) : document.body;
+    if (!target) return;
+    e.preventDefault();
+    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    if (id && location.hash !== '#' + id) history.pushState(null, '', '#' + id);
+  }
+  function smoothAnchorsInJs() {
+    root.classList.add('js-smooth-scroll');
+    document.addEventListener('click', onAnchorClick);
+  }
+  // With scroll restoration handled by the page (see "Keeping trigger positions true"), Back/Forward
+  // between in-page links must move to that section ourselves.
+  addEventListener('popstate', () => {
+    const target = location.hash && document.getElementById(decodeURIComponent(location.hash.slice(1)));
+    (target || document.body).scrollIntoView({ behavior: 'smooth', block: 'start' });
+  });
 
   // ---------- 1. The one orchestrated moment: the hero assembles itself ----------
   function heroIntro(ctx) {
@@ -72,6 +142,7 @@
     });
     const hide = batch => gsap.set(batch, { opacity: 0, overwrite: true });
     hide(els);
+    revealTargets.push(...els);
     ScrollTrigger.batch(els, { ...ENTER, onEnter: show(1), onEnterBack: show(-1) });
     ScrollTrigger.batch(els, { ...AWAY, onLeave: hide, onLeaveBack: hide });
   }
@@ -124,6 +195,7 @@
             { opacity: 1, y: 0, stagger: { each: 0.1, from: dir > 0 ? 'start' : 'end' }, clearProps: 'transform' }, '-=0.75');
       },
       () => { tl?.kill(); gsap.set([mark, ...lines], { opacity: 0 }); });
+    revealTargets.push(mark, ...lines);
   }
 
   // ---------- 4. Subtle parallax (desktop): layers drift at different speeds ----------

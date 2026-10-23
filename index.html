@@ -265,6 +265,8 @@
 
   /* motion layer (assets/motion.js): the hero waits hidden only while the intro is about to play */
   .motion [data-hero-in] { visibility: hidden; }
+  /* while the motion layer runs, it scrolls anchor links smoothly itself; CSS smoothing would break ScrollTrigger's measuring */
+  html.js-smooth-scroll { scroll-behavior: auto !important; }
   @media (min-width: 1024px) { [data-hero-copy], #demo .tool { will-change: transform; } }
 
   /* page transitions between home, privacy and terms; the logo holds its place */
