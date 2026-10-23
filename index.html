@@ -224,6 +224,27 @@
   .icon-btn:active { transform: scale(.9); }
   .icon-btn:focus-visible { outline: 2px solid var(--teal); outline-offset: 2px; }
   .icon-btn svg { position: relative; }
+  /* sign-in and account dialogs */
+  .btn-light { background: #fff; color: var(--navy); box-shadow: 0 1px 1px rgba(3,10,22,.25), 0 8px 20px -10px rgba(3,10,22,.7); }
+  .btn-light::after { content: ""; position: absolute; inset: 0; border-radius: inherit; background: rgba(9,27,51,.06); opacity: 0; transition: opacity .2s ease; }
+  .btn-light:hover::after { opacity: 1; }
+  .btn-light:active::after { opacity: .5; }
+  .btn-light > * { position: relative; }
+  .text-input { font-size: 16px; letter-spacing: normal; }
+  .or-rule { display: flex; align-items: center; gap: 12px; font-size: 13px; color: rgba(169,184,208,.8); }
+  .or-rule::before, .or-rule::after { content: ""; flex: 1; height: 1px; background: rgba(255,255,255,.1); }
+  .avatar-btn { position: relative; display: grid; place-items: center; border-radius: 999px; cursor: pointer; transition: transform .35s var(--spring); }
+  .avatar-btn::after { content: ""; position: absolute; inset: -3px; border-radius: inherit; border: 2px solid rgba(255,255,255,.35); opacity: 0; transition: opacity .2s ease; }
+  .avatar-btn:hover::after { opacity: 1; }
+  .avatar-btn:active { transform: scale(.94); }
+  .avatar-btn:focus-visible { outline: 2px solid var(--teal); outline-offset: 3px; }
+  .avatar-btn .avatar { width: 36px; height: 36px; font-size: 14px; }
+  .avatar-lg { width: 56px; height: 56px; font-size: 22px; }
+  .account-facts { border-top: 1px solid rgba(255,255,255,.08); }
+  .account-facts > div { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding-block: 14px; border-bottom: 1px solid rgba(255,255,255,.08); font-size: 15px; }
+  .account-facts dt { color: var(--mist); }
+  .account-facts dd { text-align: right; }
+
   .dialog-tile { width: 56px; height: 56px; border-radius: 16px; display: grid; place-items: center; background: linear-gradient(135deg, rgba(26,115,232,.22), rgba(16,185,129,.22)); }
 
   /* faq */
@@ -287,7 +308,11 @@
       <a class="navlink" href="#pricing"><span>Pricing</span></a>
       <a class="navlink" href="#faq"><span>FAQ</span></a>
     </div>
-    <a href="#top" data-focus-demo class="btn btn-primary btn-sm">Try it free</a>
+    <div class="flex items-center gap-4 sm:gap-6">
+      <button type="button" id="nav-signin" class="navlink" hidden><span>Sign in</span></button>
+      <button type="button" id="nav-account" class="avatar-btn" hidden aria-label="Your account"><span class="avatar" id="nav-avatar" style="--a:#1A73E8;--b:#10B981"></span></button>
+      <a href="#top" data-focus-demo class="btn btn-primary btn-sm">Try it free</a>
+    </div>
   </nav>
 </header>
 
@@ -552,7 +577,7 @@
           <ul class="mt-8 space-y-3 text-[15px]">
             <li class="flex gap-3"><svg class="mt-1 shrink-0" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#10B981" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>Unlimited rewrites</li>
             <li class="flex gap-3"><svg class="mt-1 shrink-0" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#10B981" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>Pro features as they launch</li>
-            <li class="flex gap-3"><svg class="mt-1 shrink-0" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#10B981" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>Lasts until you close the tab</li>
+            <li class="flex gap-3"><svg class="mt-1 shrink-0" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#10B981" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>Saved to your account when signed in</li>
           </ul>
           <button type="button" id="invite-card-btn" data-invite-open class="btn btn-secondary mt-10 w-full">Enter invite code</button>
         </div>
@@ -658,10 +683,71 @@
         <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#10B981" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9.5"/><path d="m8 12.5 2.8 2.8L16.5 9.5"/></svg>
       </div>
       <h2 class="mt-6 text-[28px] sm:text-[32px]">Invited access is on</h2>
-      <p class="mt-3 text-[15px] text-mist">You have unlimited rewrites in every tone, the same as Pro. It stays on until you close this tab.</p>
+      <p class="mt-3 text-[15px] text-mist">You have unlimited rewrites in every tone, the same as Pro. <span id="invite-lasts">It stays on until you close this tab.</span></p>
       <div class="mt-8 flex justify-end">
         <button type="button" id="invite-finish" class="btn btn-primary btn-sm">Start rewriting</button>
       </div>
+    </div>
+  </div>
+</dialog>
+<!-- Sign in (assets/auth.js). Hidden entirely unless Supabase is configured. -->
+<dialog id="signin" class="invite" aria-labelledby="signin-title">
+  <div class="relative p-6 sm:p-8">
+    <button type="button" class="icon-btn absolute right-3 top-3" data-dialog-close aria-label="Close">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg>
+    </button>
+
+    <div id="signin-ask">
+      <div class="dialog-tile">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="url(#brandGrad)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>
+      </div>
+      <h2 id="signin-title" class="mt-6 text-[28px] sm:text-[32px]">Sign in</h2>
+      <p class="mt-3 text-[15px] text-mist">Enter your email and we'll send you a sign-in link. No password needed. Your plan and daily rewrites then follow you to any device.</p>
+
+      <form id="signin-email" class="mt-6" novalidate>
+        <label for="signin-address" class="block text-[14px] font-medium">Email</label>
+        <input id="signin-address" type="email" autocomplete="email" spellcheck="false" class="invite-input text-input mt-2" placeholder="you@example.com" aria-describedby="signin-error">
+        <p id="signin-error" role="alert" class="mt-3 text-[14px] leading-[1.5] text-[#FF9C8A] empty:hidden"></p>
+        <button type="submit" id="signin-send" class="btn btn-primary mt-4 w-full">Email me a sign-in link</button>
+      </form>
+      <p class="mt-5 text-[13px] leading-[1.5] text-mist/80">By signing in you agree to the <a href="terms.html" class="linkbtn">terms</a> and <a href="privacy.html" class="linkbtn">privacy policy</a>.</p>
+    </div>
+
+    <div id="signin-sent" hidden>
+      <div class="dialog-tile">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#10B981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>
+      </div>
+      <h2 class="mt-6 text-[28px] sm:text-[32px]">Check your inbox</h2>
+      <p class="mt-3 text-[15px] text-mist">We sent a sign-in link to <b id="signin-sent-to" class="font-semibold text-white"></b>. Open it to finish signing in. It can take a minute to arrive, so check your spam folder too.</p>
+      <div class="mt-8 flex flex-wrap justify-end gap-3">
+        <button type="button" id="signin-again" class="btn btn-secondary btn-sm">Use a different email</button>
+        <button type="button" class="btn btn-primary btn-sm" data-dialog-close>Done</button>
+      </div>
+    </div>
+  </div>
+</dialog>
+
+<!-- Account (assets/auth.js) -->
+<dialog id="account" class="invite" aria-labelledby="account-title">
+  <div class="relative p-6 sm:p-8">
+    <button type="button" class="icon-btn absolute right-3 top-3" data-dialog-close aria-label="Close">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg>
+    </button>
+    <div class="flex items-center gap-4 pr-10">
+      <span class="avatar avatar-lg" id="account-avatar" style="--a:#1A73E8;--b:#10B981" aria-hidden="true"></span>
+      <div class="min-w-0">
+        <h2 id="account-title" class="text-[26px]">Your account</h2>
+        <p id="account-email" class="truncate text-[15px] text-mist"></p>
+      </div>
+    </div>
+    <dl class="account-facts mt-8">
+      <div><dt>Plan</dt><dd><span id="account-plan" class="chip bg-white/5 text-mist">Free plan</span></dd></div>
+      <div><dt>Today</dt><dd id="account-usage">–</dd></div>
+    </dl>
+    <p class="mt-5 text-[14px] leading-[1.6] text-mist">Your plan and daily rewrites follow you on any device where you sign in.</p>
+    <div class="mt-8 flex flex-wrap justify-end gap-3">
+      <button type="button" id="account-leave" class="btn btn-secondary btn-sm" hidden>Switch to free plan</button>
+      <button type="button" id="account-signout" class="btn btn-primary btn-sm">Sign out</button>
     </div>
   </div>
 </dialog>
@@ -835,7 +921,13 @@ Excited for this next chapter and can't wait to see what the future holds!
   const TOKEN_KEY = 'slr_access';
   const getToken = () => { try { return sessionStorage.getItem(TOKEN_KEY); } catch { return null; } };
   const setToken = t => { try { t ? sessionStorage.setItem(TOKEN_KEY, t) : sessionStorage.removeItem(TOKEN_KEY); } catch {} };
-  const apiHeaders = () => ({ 'Content-Type': 'application/json', ...(getToken() ? { 'X-Access-Token': getToken() } : {}) });
+  // When signed in (assets/auth.js), requests also carry the Supabase access token.
+  const authToken = () => window.slrAuth?.token() || null;
+  const apiHeaders = () => ({
+    'Content-Type': 'application/json',
+    ...(getToken() ? { 'X-Access-Token': getToken() } : {}),
+    ...(authToken() ? { Authorization: 'Bearer ' + authToken() } : {}),
+  });
 
   function setUsage(u) {
     if (!PLAN[u?.plan]) return;
@@ -858,18 +950,34 @@ Excited for this next chapter and can't wait to see what the future holds!
     });
     document.querySelector('[data-popular]').hidden = u.plan === 'pro';
     inviteCardBtn.textContent = u.plan === 'invited' ? 'Switch to free plan' : 'Enter invite code';
+    document.dispatchEvent(new CustomEvent('slr:usage', { detail: u })); // account dialog listens
   }
 
-  const loadStatus = () => fetch('/api/status', { headers: apiHeaders() })
-    .then(r => (r.ok ? r.json() : null)).then(setUsage).catch(() => {});
+  // Only the latest request wins (e.g. the anonymous check at load vs. the one after sign-in restores).
+  let statusSeq = 0;
+  const loadStatus = () => {
+    const n = ++statusSeq;
+    return fetch('/api/status', { headers: apiHeaders() })
+      .then(r => (r.ok ? r.json() : null)).then(u => { if (n === statusSeq) setUsage(u); }).catch(() => {});
+  };
   loadStatus();
 
-  // Leaving is local: drop the token and ask the server what this visitor gets as a free user.
-  function leaveInvited() {
+  // Leaving drops the tab pass and, when signed in, the invited access saved on the account;
+  // then the server says what this visitor gets as a free user.
+  async function leaveInvited() {
     setToken(null);
     planUsage.textContent = 'Switching to the free plan…';
-    loadStatus();
+    if (authToken()) {
+      try {
+        const res = await fetch('/api/invite', { method: 'DELETE', headers: apiHeaders() });
+        if (res.ok) return setUsage((await res.json()).usage);
+      } catch {}
+    }
+    return loadStatus();
   }
+
+  // Hooks for the sign-in layer (assets/auth.js).
+  window.slrPage = { loadStatus, leaveInvited, plan: () => plan };
 
   // ---------- Invite code dialog ----------
   const dlg = document.getElementById('invite'), askForm = document.getElementById('invite-ask');
@@ -903,14 +1011,17 @@ Excited for this next chapter and can't wait to see what the future holds!
     try {
       const res = await fetch('/api/invite', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: apiHeaders(),
         body: JSON.stringify({ code }),
         signal: AbortSignal.timeout(15000),
       });
       const data = await res.json().catch(() => ({}));
       if (!res.ok) throw new Error(data.error || "Couldn't check the code. Try again.");
-      setToken(data.token);
+      setToken(data.token); // only for a tab pass; saved-to-account access needs no token
       setUsage(data.usage);
+      document.getElementById('invite-lasts').textContent = data.saved === 'account'
+        ? 'It stays on for your account, on any device, until you sign out.'
+        : 'It stays on until you close this tab.';
       showError('');
       askForm.hidden = true; doneView.hidden = false;
       document.getElementById('invite-finish').focus();
@@ -1017,6 +1128,9 @@ Excited for this next chapter and can't wait to see what the future holds!
     }), { threshold: 0.4 }).observe(cl);
   } else cl.classList.add('struck');
 </script>
+<!-- Optional sign-in: Supabase client (pinned, integrity-checked) + assets/auth.js. The page works without them. -->
+<script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.3/dist/umd/supabase.js" integrity="sha384-BWcjm9OdFth9TbhCxZPdm+gAOUMAzQy9nmTs12ioXdCcbVnJaPMn+fMUoQCLt60R" crossorigin="anonymous"></script>
+<script defer src="assets/auth.js"></script>
 <!-- Motion layer: GSAP + ScrollTrigger + SplitText (all free). Loaded last so the page works without it. -->
 <script defer src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.14.2/gsap.min.js"></script>
 <script defer src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.14.2/ScrollTrigger.min.js"></script>
