@@ -172,9 +172,10 @@
   .cliche::after { content: ""; position: absolute; left: 14px; right: 14px; top: 50%; height: 2px; border-radius: 2px; background: var(--teal); transform: scaleX(0); transform-origin: left; transition: transform .7s var(--ease-out); }
   .struck .cliche::after { transform: scaleX(1); }
 
-  /* reviews: elevated cards in a staggered column flow */
-  .review { break-inside: avoid; margin-bottom: var(--s3); padding: var(--s4); border-radius: 20px; background: #fff; box-shadow: var(--shadow-elev); }
-  @media (min-width: 1024px) { .review { margin-bottom: var(--s4); } }
+  /* reviews: elevated cards; the person is pinned to the bottom so cards in a row line up */
+  .review { display: flex; flex-direction: column; padding: var(--s4); border-radius: 20px; background: #fff; box-shadow: var(--shadow-elev); }
+  .review blockquote { margin-bottom: var(--s3); }
+  .review .person { margin-top: auto; }
   .review blockquote { font-size: 16.5px; line-height: 1.65; color: #18263C; }
   .stars { width: 108px; height: 18px; background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='22' height='18' viewBox='0 0 22 18'%3E%3Cpath fill='%2310B981' d='M9 .8l2.5 5.1 5.6.8-4 3.9.9 5.6L9 13.6l-5 2.6.9-5.6-4-3.9 5.6-.8z'/%3E%3C/svg%3E") left center / 22px 18px repeat-x; }
   .person { display: flex; align-items: center; gap: 12px; margin-top: var(--s3); padding-top: var(--s3); border-top: 1px solid rgba(9,27,51,.08); font-size: 14px; line-height: 1.4; color: var(--slate); }
@@ -454,46 +455,34 @@
     </div>
   </section>
 
-  <!-- Reviews. SAMPLE CONTENT: these are placeholder reviews, not from real users. The section is
-       hidden everywhere except localhost (see the script) until real reviews replace them. -->
-  <section id="reviews" class="light-bg section relative text-ink" data-sample-reviews hidden>
+  <!-- Reviews from real early users, published with their permission. -->
+  <section id="reviews" class="light-bg section relative text-ink">
     <div class="wrap">
       <div class="max-w-[40rem]">
-        <span class="chip bg-[#FFE9E4] text-[#B8442F]">Sample reviews, shown on localhost only</span>
-        <h2 class="mt-5 text-[36px] sm:text-[48px]">Posts people are glad they published.</h2>
-        <p class="mt-5 text-[18px] text-slate">What people say after using it on their own drafts.</p>
+        <h2 class="text-[36px] sm:text-[48px]">What early users say.</h2>
+        <p class="mt-5 text-[18px] text-slate">Feedback from people who've used it on their own posts and messages.</p>
       </div>
 
-      <div class="mt-16 gap-6 sm:columns-2 lg:columns-3 lg:gap-8">
+      <div class="mt-16 grid gap-6 md:grid-cols-2 lg:gap-8">
         <figure class="review">
           <div class="stars" role="img" aria-label="5 out of 5 stars"></div>
-          <blockquote class="mt-4">I used to spend half an hour fiddling with a launch post. Now I paste my notes, pick Concise, and change one line. The first sentence finally says what the post is about.</blockquote>
-          <figcaption class="person"><span class="avatar" style="--a:#1A73E8;--b:#10B981">PR</span><span><b>Priya Raman</b>Product Marketing Manager</span></figcaption>
+          <blockquote class="mt-4">I often know what I want to say on LinkedIn, but finding the right words takes time. This tool helps me turn rough thoughts into clear, professional posts in seconds.</blockquote>
+          <figcaption class="person"><span class="avatar" style="--a:#1A73E8;--b:#10B981">AS</span><span><b>Adrian Sanchez</b>Marketing Manager</span></figcaption>
         </figure>
         <figure class="review">
           <div class="stars" role="img" aria-label="5 out of 5 stars"></div>
-          <blockquote class="mt-4">I'm not a writer and my posts showed it. Storytelling turned a dry list of what I shipped into something people actually commented on.</blockquote>
-          <figcaption class="person"><span class="avatar" style="--a:#10B981;--b:#0F2547">DO</span><span><b>Daniel Okafor</b>Backend Engineer</span></figcaption>
+          <blockquote class="mt-4">No complicated settings or unnecessary steps. I enter my text, rewrite it, and get a more polished version that still sounds like me.</blockquote>
+          <figcaption class="person"><span class="avatar" style="--a:#10B981;--b:#0F2547">MH</span><span><b>Mike Haccke</b>Software Engineer</span></figcaption>
         </figure>
         <figure class="review">
           <div class="stars" role="img" aria-label="5 out of 5 stars"></div>
-          <blockquote class="mt-4">Our job posts were full of rockstars and fast-paced environments. It cut the clichés and kept the details candidates care about: the team, the stack, the salary range.</blockquote>
-          <figcaption class="person"><span class="avatar" style="--a:#155FC2;--b:#1A73E8">LF</span><span><b>Lucía Fernández</b>Technical Recruiter</span></figcaption>
+          <blockquote class="mt-4">Whether I’m refining a LinkedIn post or improving a professional message, this tool gives me a useful starting point and saves me time.</blockquote>
+          <figcaption class="person"><span class="avatar" style="--a:#155FC2;--b:#1A73E8">SZ</span><span><b>Simon Zieger</b>Business Development Manager</span></figcaption>
         </figure>
         <figure class="review">
           <div class="stars" role="img" aria-label="5 out of 5 stars"></div>
-          <blockquote class="mt-4">What I like most is what it doesn't do. It never added numbers or results I hadn't mentioned, so I can post without checking every line twice.</blockquote>
-          <figcaption class="person"><span class="avatar" style="--a:#0F2547;--b:#10B981">TB</span><span><b>Tom Becker</b>Founder, design studio</span></figcaption>
-        </figure>
-        <figure class="review">
-          <div class="stars" role="img" aria-label="5 out of 5 stars"></div>
-          <blockquote class="mt-4">Five free rewrites a day is plenty for me. I run every post about my research through it, and it reads like me on a good day.</blockquote>
-          <figcaption class="person"><span class="avatar" style="--a:#10B981;--b:#1A73E8">AK</span><span><b>Aisha Khan</b>PhD Candidate</span></figcaption>
-        </figure>
-        <figure class="review">
-          <div class="stars" role="img" aria-label="5 out of 5 stars"></div>
-          <blockquote class="mt-4">Flipping between Professional and Concise before I post is the feature I didn't know I needed. Most of the time I end up somewhere in between and finish it myself.</blockquote>
-          <figcaption class="person"><span class="avatar" style="--a:#1A73E8;--b:#0F2547">MR</span><span><b>Marco Rossi</b>Sales Lead</span></figcaption>
+          <blockquote class="mt-4">I like that I can focus on the message instead of worrying about how to phrase every sentence. It makes polishing my writing feel effortless.</blockquote>
+          <figcaption class="person"><span class="avatar" style="--a:#0F2547;--b:#10B981">ML</span><span><b>Marvin Luelmo</b>Sales Consultant</span></figcaption>
         </figure>
       </div>
     </div>
@@ -992,12 +981,6 @@ Excited for this next chapter and can't wait to see what the future holds!
     });
   });
   showExample(0, false);
-
-  // ---------- Reviews ----------
-  // Placeholder reviews: only shown on localhost until real ones replace them.
-  if (/^(localhost|127\.0\.0\.1)$/.test(location.hostname)) {
-    document.querySelectorAll('[data-sample-reviews]').forEach(s => (s.hidden = false));
-  }
 
   // ---------- Strike clichés when visible ----------
   const cl = document.getElementById('cliches');
