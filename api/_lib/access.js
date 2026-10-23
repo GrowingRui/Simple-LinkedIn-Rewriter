@@ -161,6 +161,13 @@ export async function redeemInvite(req, res, code) {
   return { status: 200, body: { saved: 'tab', token: sign(`invited:${Date.now() + ACCESS_TTL_MS}`), usage } };
 }
 
+// Deleting an account: remove everything stored under its id (invited access, today's count).
+export async function forgetAccount(user) {
+  if (!redisUrl()) return;
+  try { await redis([['DEL', invitedKey(user)], ['DEL', `use:${today()}:u:${user.id}`]]); }
+  catch (err) { console.error(err.message); }
+}
+
 // "Switch to free plan" and signing out: drop invited access saved on the account.
 // (A tab-only pass is simply forgotten by the page.)
 export async function leaveInvite(req, res) {

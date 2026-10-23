@@ -8,6 +8,20 @@ export const supabaseUrl = () => (process.env.SUPABASE_URL || process.env.NEXT_P
 export const supabaseKey = () => process.env.SUPABASE_PUBLISHABLE_KEY || process.env.SUPABASE_ANON_KEY
   || process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
 export const authEnabled = () => Boolean(supabaseUrl() && supabaseKey());
+// Server-only key for admin actions (deleting an account). Never sent to the browser.
+export const supabaseSecretKey = () => process.env.SUPABASE_SECRET_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY || '';
+
+// Permanently delete a user from Supabase Auth. -> true on success.
+export async function deleteAuthUser(id) {
+  const key = supabaseSecretKey();
+  const headers = { apikey: key };
+  if (key.startsWith('eyJ')) headers.Authorization = `Bearer ${key}`; // legacy service_role JWT
+  const r = await fetch(`${supabaseUrl()}/auth/v1/admin/users/${encodeURIComponent(id)}`, {
+    method: 'DELETE', headers, signal: AbortSignal.timeout(8000),
+  });
+  if (!r.ok) console.error('delete user:', r.status, (await r.text()).slice(0, 200));
+  return r.ok;
+}
 
 const b64json = s => JSON.parse(Buffer.from(s, 'base64url').toString('utf8'));
 

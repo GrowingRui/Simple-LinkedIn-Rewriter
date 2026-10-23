@@ -249,6 +249,14 @@
   .account-facts > div { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding-block: 14px; border-bottom: 1px solid rgba(255,255,255,.08); font-size: 15px; }
   .account-facts dt { color: var(--mist); }
   .account-facts dd { text-align: right; }
+  /* destructive actions read as such: coral, and a second confirming step */
+  .linkbtn.danger { color: #FF9C8A; text-decoration-color: rgba(255,156,138,.4); }
+  .linkbtn.danger:focus-visible { outline-color: #FF9C8A; }
+  .btn-danger { background: #D9534F; color: #fff; box-shadow: 0 1px 1px rgba(3,10,22,.2), 0 6px 16px -6px rgba(217,83,79,.7); }
+  .btn-danger::after { content: ""; position: absolute; inset: 0; border-radius: inherit; background: linear-gradient(180deg, rgba(255,255,255,.18), transparent 60%); opacity: 0; transition: opacity .25s ease; }
+  .btn-danger:hover::after { opacity: 1; }
+  .btn-danger:active::after { opacity: .4; }
+  .danger-zone { border-radius: 16px; padding: 20px; background: rgba(217,83,79,.08); border: 1px solid rgba(255,156,138,.3); }
 
   .dialog-tile { width: 56px; height: 56px; border-radius: 16px; display: grid; place-items: center; background: linear-gradient(135deg, rgba(26,115,232,.22), rgba(16,185,129,.22)); }
 
@@ -713,40 +721,92 @@
     </div>
   </div>
 </dialog>
-<!-- Sign in (assets/auth.js). Hidden entirely unless Supabase is configured. -->
+<!-- Sign in / create account (assets/auth.js). Hidden entirely unless Supabase is configured. -->
 <dialog id="signin" class="invite" aria-labelledby="signin-title">
   <div class="relative p-6 sm:p-8">
     <button type="button" class="icon-btn absolute right-3 top-3" data-dialog-close aria-label="Close">
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg>
     </button>
 
-    <div id="signin-ask">
+    <!-- Sign in and Create account share one form; data-mode switches the wording. -->
+    <form id="auth-form" data-mode="signin" novalidate>
       <div class="dialog-tile">
         <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="url(#brandGrad)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>
       </div>
       <h2 id="signin-title" class="mt-6 text-[28px] sm:text-[32px]">Sign in</h2>
-      <p class="mt-3 text-[15px] text-mist">Enter your email and we'll send you a sign-in link. No password needed. Your plan and daily rewrites then follow you to any device.</p>
+      <p id="auth-lead" class="mt-3 text-[15px] text-mist">Welcome back. Your plan and daily rewrites follow you to any device.</p>
 
-      <form id="signin-email" class="mt-6" novalidate>
-        <label for="signin-address" class="block text-[14px] font-medium">Email</label>
-        <input id="signin-address" type="email" autocomplete="email" spellcheck="false" class="invite-input text-input mt-2" placeholder="you@example.com" aria-describedby="signin-error">
-        <p id="signin-error" role="alert" class="mt-3 text-[14px] leading-[1.5] text-[#FF9C8A] empty:hidden"></p>
-        <button type="submit" id="signin-send" class="btn btn-primary mt-4 w-full">Email me a sign-in link</button>
-      </form>
-      <p class="mt-5 text-[13px] leading-[1.5] text-mist/80">By signing in you agree to the <a href="terms.html" class="linkbtn">terms</a> and <a href="privacy.html" class="linkbtn">privacy policy</a>.</p>
-    </div>
+      <label for="auth-email" class="mt-6 block text-[14px] font-medium">Email</label>
+      <input id="auth-email" type="email" autocomplete="email" spellcheck="false" class="invite-input text-input mt-2" placeholder="you@example.com" aria-describedby="auth-error">
 
-    <div id="signin-sent" hidden>
+      <div class="mt-4 flex items-baseline justify-between gap-3">
+        <label for="auth-password" class="block text-[14px] font-medium">Password</label>
+        <button type="button" id="auth-forgot-open" class="linkbtn text-[13px]">Forgot password?</button>
+      </div>
+      <div class="relative mt-2">
+        <input id="auth-password" type="password" autocomplete="current-password" class="invite-input text-input pr-16" aria-describedby="auth-hint auth-error">
+        <button type="button" id="auth-show" class="linkbtn absolute right-4 top-1/2 -translate-y-1/2 text-[13px]" aria-controls="auth-password" aria-pressed="false">Show</button>
+      </div>
+      <p id="auth-hint" class="mt-2 text-[13px] text-mist/80" hidden>At least 8 characters.</p>
+
+      <!-- Invited sign-up: one more field. Normal sign-up can reveal it with the link below. -->
+      <div id="auth-invite" hidden>
+        <label for="auth-code" class="mt-4 block text-[14px] font-medium">Invite code</label>
+        <input id="auth-code" class="invite-input mt-2" inputmode="numeric" autocomplete="off" spellcheck="false" maxlength="32" placeholder="Your code" aria-describedby="auth-error">
+      </div>
+      <p id="auth-invite-toggle-wrap" class="mt-3 text-[13px]" hidden><button type="button" id="auth-invite-toggle" class="linkbtn">Have an invite code?</button></p>
+
+      <p id="auth-error" role="alert" class="mt-3 text-[14px] leading-[1.5] text-[#FF9C8A] empty:hidden"></p>
+      <button type="submit" id="auth-submit" class="btn btn-primary mt-5 w-full">Sign in</button>
+
+      <p class="mt-5 text-center text-[14px] text-mist">
+        <span id="auth-switch-text">Don't have an account?</span>
+        <button type="button" id="auth-switch" class="linkbtn">Create one</button>
+      </p>
+      <p class="mt-4 text-[13px] leading-[1.5] text-mist/80">By continuing you agree to the <a href="terms.html" class="linkbtn">terms</a> and <a href="privacy.html" class="linkbtn">privacy policy</a>. You don't need an account for the 5 free rewrites a day.</p>
+    </form>
+
+    <!-- Forgot password: ask for the email -->
+    <form id="auth-forgot" hidden novalidate>
+      <div class="dialog-tile">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="url(#brandGrad)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
+      </div>
+      <h2 class="mt-6 text-[28px] sm:text-[32px]">Reset your password</h2>
+      <p class="mt-3 text-[15px] text-mist">Enter your account email and we'll send you a link to choose a new password.</p>
+      <label for="forgot-email" class="mt-6 block text-[14px] font-medium">Email</label>
+      <input id="forgot-email" type="email" autocomplete="email" spellcheck="false" class="invite-input text-input mt-2" placeholder="you@example.com" aria-describedby="forgot-error">
+      <p id="forgot-error" role="alert" class="mt-3 text-[14px] leading-[1.5] text-[#FF9C8A] empty:hidden"></p>
+      <div class="mt-6 flex flex-wrap justify-end gap-3">
+        <button type="button" class="btn btn-secondary btn-sm" data-auth-back>Back to sign in</button>
+        <button type="submit" id="forgot-submit" class="btn btn-primary btn-sm">Send reset link</button>
+      </div>
+    </form>
+
+    <!-- A message view: reset link sent, or account created but needs email confirmation -->
+    <div id="auth-note" hidden>
       <div class="dialog-tile">
         <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#10B981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>
       </div>
-      <h2 class="mt-6 text-[28px] sm:text-[32px]">Check your inbox</h2>
-      <p class="mt-3 text-[15px] text-mist">We sent a sign-in link to <b id="signin-sent-to" class="font-semibold text-white"></b>. Open it to finish signing in. It can take a minute to arrive, so check your spam folder too.</p>
+      <h2 id="auth-note-title" class="mt-6 text-[28px] sm:text-[32px]">Check your inbox</h2>
+      <p id="auth-note-text" class="mt-3 text-[15px] text-mist"></p>
       <div class="mt-8 flex flex-wrap justify-end gap-3">
-        <button type="button" id="signin-again" class="btn btn-secondary btn-sm">Use a different email</button>
+        <button type="button" class="btn btn-secondary btn-sm" data-auth-back>Back to sign in</button>
         <button type="button" class="btn btn-primary btn-sm" data-dialog-close>Done</button>
       </div>
     </div>
+
+    <!-- Back from a reset link: choose a new password -->
+    <form id="auth-reset" hidden novalidate>
+      <div class="dialog-tile">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="url(#brandGrad)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
+      </div>
+      <h2 class="mt-6 text-[28px] sm:text-[32px]">Choose a new password</h2>
+      <p class="mt-3 text-[15px] text-mist">At least 8 characters. You'll stay signed in.</p>
+      <label for="reset-password" class="mt-6 block text-[14px] font-medium">New password</label>
+      <input id="reset-password" type="password" autocomplete="new-password" class="invite-input text-input mt-2" aria-describedby="reset-error">
+      <p id="reset-error" role="alert" class="mt-3 text-[14px] leading-[1.5] text-[#FF9C8A] empty:hidden"></p>
+      <button type="submit" id="reset-submit" class="btn btn-primary mt-5 w-full">Save new password</button>
+    </form>
   </div>
 </dialog>
 
@@ -768,9 +828,23 @@
       <div><dt>Today</dt><dd id="account-usage">–</dd></div>
     </dl>
     <p class="mt-5 text-[14px] leading-[1.6] text-mist">Your plan and daily rewrites follow you on any device where you sign in.</p>
-    <div class="mt-8 flex flex-wrap justify-end gap-3">
-      <button type="button" id="account-leave" class="btn btn-secondary btn-sm" hidden>Switch to free plan</button>
-      <button type="button" id="account-signout" class="btn btn-primary btn-sm">Sign out</button>
+    <div class="mt-8 flex flex-wrap items-center justify-between gap-3">
+      <button type="button" id="account-delete" class="linkbtn danger text-[14px]">Delete account</button>
+      <div class="flex flex-wrap gap-3">
+        <button type="button" id="account-leave" class="btn btn-secondary btn-sm" hidden>Switch to free plan</button>
+        <button type="button" id="account-signout" class="btn btn-primary btn-sm">Sign out</button>
+      </div>
+    </div>
+
+    <!-- Delete: a second, explicit step -->
+    <div id="delete-confirm" class="danger-zone mt-6" hidden>
+      <p class="text-[15px] font-semibold text-white">Delete your account?</p>
+      <p class="mt-2 text-[14px] leading-[1.6] text-mist">This permanently removes your account, your saved invited access and your usage history. It can't be undone. You can still use the free rewrites without an account.</p>
+      <p id="delete-error" role="alert" class="mt-3 text-[14px] leading-[1.5] text-[#FF9C8A] empty:hidden"></p>
+      <div class="mt-5 flex flex-wrap justify-end gap-3">
+        <button type="button" id="delete-cancel" class="btn btn-secondary btn-sm">Cancel</button>
+        <button type="button" id="delete-yes" class="btn btn-danger btn-sm">Delete permanently</button>
+      </div>
     </div>
   </div>
 </dialog>
@@ -1080,10 +1154,40 @@ Excited for this next chapter and can't wait to see what the future holds!
     codeInput.focus();
   }
 
-  document.querySelectorAll('[data-invite-open]').forEach(b => b.addEventListener('click', () => (plan === 'invited' ? leaveInvited() : openInvite())));
+  document.querySelectorAll('[data-invite-open]').forEach(b => b.addEventListener('click', () => {
+    if (plan === 'invited') return leaveInvited();
+    // The pricing card's button signs visitors up as invited users (account + code in one form).
+    // Signed-in visitors, or a page without accounts, get the plain code dialog.
+    if (b.id === 'invite-card-btn' && window.slrAuth?.openInvitedSignup && !authToken()) return window.slrAuth.openInvitedSignup();
+    openInvite();
+  }));
   dlg.querySelectorAll('[data-invite-close]').forEach(b => b.addEventListener('click', () => dlg.close()));
   dlg.addEventListener('click', e => { if (e.target === dlg) dlg.close(); }); // click on the dimmed backdrop
   codeInput.addEventListener('input', () => { inviteError.textContent = ''; codeInput.removeAttribute('aria-invalid'); });
+
+  // Redeem a code for this visitor (saved on the account when signed in, else a tab pass).
+  // `checkOnly` asks the server without any identity, just to learn whether the code is valid.
+  // Resolves with the server's reply; rejects with a message fit to show the visitor.
+  async function redeemInvite(code, { checkOnly = false } = {}) {
+    let res;
+    try {
+      res = await fetch('/api/invite', {
+        method: 'POST',
+        headers: checkOnly ? { 'Content-Type': 'application/json' } : apiHeaders(),
+        body: JSON.stringify({ code }),
+        signal: AbortSignal.timeout(15000),
+      });
+    } catch { throw new Error("Couldn't reach the server. Check your connection and try again."); }
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) throw new Error(data.error || "Couldn't check the code. Try again.");
+    if (!checkOnly) {
+      setToken(data.token); // only for a tab pass; saved-to-account access needs no token
+      setUsage(data.usage);
+      showError('');
+    }
+    return data;
+  }
+  window.slrPage.redeemInvite = redeemInvite;
 
   askForm.addEventListener('submit', async e => {
     e.preventDefault();
@@ -1091,26 +1195,14 @@ Excited for this next chapter and can't wait to see what the future holds!
     if (!code) return inviteFail('Enter your invite code.');
     inviteSubmit.disabled = true; inviteSubmit.textContent = 'Checking…';
     try {
-      const res = await fetch('/api/invite', {
-        method: 'POST',
-        headers: apiHeaders(),
-        body: JSON.stringify({ code }),
-        signal: AbortSignal.timeout(15000),
-      });
-      const data = await res.json().catch(() => ({}));
-      if (!res.ok) throw new Error(data.error || "Couldn't check the code. Try again.");
-      setToken(data.token); // only for a tab pass; saved-to-account access needs no token
-      setUsage(data.usage);
+      const data = await redeemInvite(code);
       document.getElementById('invite-lasts').textContent = data.saved === 'account'
         ? 'It stays on for your account, on any device, until you sign out.'
         : 'It stays on until you close this tab.';
-      showError('');
       askForm.hidden = true; doneView.hidden = false;
       document.getElementById('invite-finish').focus();
     } catch (err) {
-      inviteFail(err.name === 'TypeError' || err.name === 'TimeoutError'
-        ? "Couldn't reach the server. Check your connection and try again."
-        : err.message);
+      inviteFail(err.message);
     } finally {
       inviteSubmit.disabled = false; inviteSubmit.textContent = 'Verify code';
     }
