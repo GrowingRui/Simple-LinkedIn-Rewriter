@@ -133,6 +133,11 @@
   .tone[aria-checked="true"] { color: #fff; }
   .tone[aria-checked="true"]::before { opacity: 1; background: var(--royal); box-shadow: 0 4px 12px -4px rgba(26,115,232,.8); }
   .tone > span { position: relative; }
+  /* tone is the secondary choice: smaller, and marked with a teal tint instead of the blue fill */
+  .tone-sm { font-size: 13px; padding: 6px 12px; }
+  .tone-sm::before { background: rgba(255,255,255,.05); }
+  .tone-sm[aria-checked="true"] { color: var(--teal); }
+  .tone-sm[aria-checked="true"]::before { opacity: 1; background: rgba(16,185,129,.14); box-shadow: inset 0 0 0 1px rgba(16,185,129,.45); }
 
   .post-body p { margin: 0 0 12px; }
   .post-body p:last-child { margin-bottom: 0; }
@@ -325,7 +330,7 @@
     <div class="wrap relative z-10 grid grid-cols-1 items-center gap-16 lg:grid-cols-12 lg:gap-12">
       <div class="min-w-0 lg:col-span-5" data-hero-copy>
         <h1 class="text-[44px] sm:text-[56px] lg:text-[64px]" data-hero-in="title">Write LinkedIn posts people finish reading.</h1>
-        <p class="mt-6 max-w-[34rem] text-[18px] text-mist" data-hero-in>Paste a rough draft. Simple LinkedIn Rewriter puts your point up front, cuts the filler, and keeps it sounding like you, not like a press release.</p>
+        <p class="mt-6 max-w-[34rem] text-[18px] text-mist" data-hero-in>Paste a rough post, your About section or a message. Simple LinkedIn Rewriter puts your point up front, cuts the filler, and keeps it sounding like you, not like a press release.</p>
         <div class="mt-10 flex flex-wrap items-center gap-4" data-hero-in>
           <a href="#demo" data-focus-demo class="btn btn-primary">Rewrite a post free</a>
           <a href="#examples" class="btn btn-secondary">See examples</a>
@@ -342,15 +347,33 @@
 
         <div class="tool relative p-4 sm:p-6">
           <div class="flex flex-wrap items-center justify-between gap-3">
-            <div role="radiogroup" aria-label="Tone" class="flex flex-wrap gap-1 rounded-full bg-navy/60 p-1" id="tones">
-              <button type="button" role="radio" aria-checked="true" class="tone" data-tone="professional"><span>Professional</span></button>
-              <button type="button" role="radio" aria-checked="false" class="tone" data-tone="concise"><span>Concise</span></button>
-              <button type="button" role="radio" aria-checked="false" class="tone" data-tone="story"><span>Storytelling</span></button>
+            <div role="radiogroup" aria-label="What are you writing?" class="flex flex-wrap gap-1 rounded-full bg-navy/60 p-1" id="kinds">
+              <button type="button" role="radio" aria-checked="true" class="tone" data-kind="post"><span>Post</span></button>
+              <button type="button" role="radio" aria-checked="false" class="tone" data-kind="profile"><span>Profile</span></button>
+              <button type="button" role="radio" aria-checked="false" class="tone" data-kind="message"><span>Message</span></button>
             </div>
             <span id="state-chip" class="chip bg-white/5 text-mist">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 1 1 3 3L7 19l-4 1 1-4Z"/></svg>
               <span id="state-label">Your draft</span>
             </span>
+          </div>
+          <div class="mt-3 flex items-start gap-3">
+            <span id="tone-label" class="shrink-0 pt-[7px] text-[13px] text-mist">Tone</span>
+            <div role="radiogroup" aria-labelledby="tone-label" class="flex flex-wrap gap-1" id="tones">
+              <button type="button" role="radio" aria-checked="true" class="tone tone-sm" data-tone="natural"><span>Natural</span></button>
+              <button type="button" role="radio" aria-checked="false" class="tone tone-sm" data-tone="confident"><span>Confident &amp; friendly</span></button>
+              <button type="button" role="radio" aria-checked="false" class="tone tone-sm" data-tone="formal"><span>Formal</span></button>
+              <button type="button" role="radio" aria-checked="false" class="tone tone-sm" data-tone="concise"><span>Concise</span></button>
+              <button type="button" role="radio" aria-checked="false" class="tone tone-sm" data-tone="persuasive"><span>Persuasive</span></button>
+            </div>
+          </div>
+          <div class="mt-2 flex items-start gap-3" id="section-row" hidden>
+            <span id="section-label" class="shrink-0 pt-[7px] text-[13px] text-mist">Section</span>
+            <div role="radiogroup" aria-labelledby="section-label" class="flex flex-wrap gap-1" id="sections">
+              <button type="button" role="radio" aria-checked="false" class="tone tone-sm" data-section="headline"><span>Headline</span></button>
+              <button type="button" role="radio" aria-checked="true" class="tone tone-sm" data-section="about"><span>About</span></button>
+              <button type="button" role="radio" aria-checked="false" class="tone tone-sm" data-section="experience"><span>Experience</span></button>
+            </div>
           </div>
 
           <article class="post mt-4 overflow-hidden sm:mt-5">
@@ -361,8 +384,8 @@
                   <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>
                 </div>
                 <div class="min-w-0">
-                  <p class="text-[15px] font-semibold leading-tight text-[#18263C]">Your post</p>
-                  <p class="truncate text-[13px] leading-tight text-[#66758C]">How it reads in the feed</p>
+                  <p id="kind-title" class="text-[15px] font-semibold leading-tight text-[#18263C]">Your post</p>
+                  <p id="kind-sub" class="truncate text-[13px] leading-tight text-[#66758C]">How it reads in the feed</p>
                 </div>
               </div>
               <label for="draft" class="sr-only">Your LinkedIn draft</label>
@@ -418,7 +441,7 @@
             <span class="font-display text-[44px] font-bold leading-none text-ink/10">1</span>
           </div>
           <h3 class="mt-8 text-[22px]">Paste your draft</h3>
-          <p class="mt-3 text-[16px] text-slate">Bullet points, a rambling paragraph, or a post you already wrote. Anything up to 3,000 characters.</p>
+          <p class="mt-3 text-[16px] text-slate">A post, your headline or About section, a job from your experience, or a message. Rough notes are fine, up to 3,000 characters.</p>
         </li>
         <li class="step-card relative p-8">
           <div class="flex items-center justify-between">
@@ -428,7 +451,7 @@
             <span class="font-display text-[44px] font-bold leading-none text-ink/10">2</span>
           </div>
           <h3 class="mt-8 text-[22px]">Pick a tone</h3>
-          <p class="mt-3 text-[16px] text-slate">Professional, concise, or storytelling. Switch between them and compare before you commit.</p>
+          <p class="mt-3 text-[16px] text-slate">Natural, confident and friendly, formal, concise or persuasive. Switch between them and compare before you commit.</p>
         </li>
         <li class="step-card relative p-8">
           <div class="flex items-center justify-between">
@@ -548,11 +571,11 @@
         <div class="plan relative p-8 sm:p-10" data-plan-card="free">
           <span class="chip absolute right-6 top-6 bg-white/10 text-white" data-your-plan hidden>Your plan</span>
           <h3 class="text-[22px]">Free</h3>
-          <p class="mt-4 flex items-baseline gap-2"><span class="font-display text-[48px] font-bold leading-none tracking-[-0.03em]">$0</span></p>
+          <p class="mt-4 flex items-baseline gap-2"><span class="font-display text-[48px] font-bold leading-none tracking-[-0.03em]">€0</span></p>
           <p class="mt-3 text-[15px] text-mist">For posting now and then.</p>
           <ul class="mt-8 space-y-3 text-[15px]">
             <li class="flex gap-3"><svg class="mt-1 shrink-0" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#10B981" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>5 rewrites a day</li>
-            <li class="flex gap-3"><svg class="mt-1 shrink-0" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#10B981" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>All three tones</li>
+            <li class="flex gap-3"><svg class="mt-1 shrink-0" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#10B981" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>Posts, profile and messages in 5 tones</li>
             <li class="flex gap-3"><svg class="mt-1 shrink-0" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#10B981" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>No account needed</li>
           </ul>
           <a href="#demo" data-focus-demo class="btn btn-secondary mt-10 w-full">Start free</a>
@@ -561,20 +584,18 @@
           <span class="chip absolute right-6 top-6 bg-teal/15 text-teal" data-popular>Coming soon</span>
           <span class="chip absolute right-6 top-6 bg-royal/25 text-white" data-your-plan hidden>Your plan</span>
           <h3 class="text-[22px]">Pro</h3>
-          <p class="mt-4 flex items-baseline gap-2"><span class="font-display text-[48px] font-bold leading-none tracking-[-0.03em]">$9</span><span class="text-mist">/ month</span></p>
+          <p class="mt-4 flex items-baseline gap-2"><span class="font-display text-[48px] font-bold leading-none tracking-[-0.03em]">€6</span><span class="text-mist">/ month</span></p>
           <p class="mt-3 text-[15px] text-mist">For people who post every week. Launching soon.</p>
           <ul class="mt-8 space-y-3 text-[15px]">
             <li class="flex gap-3"><svg class="mt-1 shrink-0" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#10B981" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>Unlimited rewrites</li>
             <li class="flex gap-3"><svg class="mt-1 shrink-0" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#10B981" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>Voice profile trained on your past posts</li>
-            <li class="flex gap-3"><svg class="mt-1 shrink-0" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#10B981" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>Rewrite history and saved drafts</li>
-            <li class="flex gap-3"><svg class="mt-1 shrink-0" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#10B981" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>Headline and About section rewrites</li>
-          </ul>
+            <li class="flex gap-3"><svg class="mt-1 shrink-0" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#10B981" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>Rewrite history and saved drafts</li>          </ul>
           <a href="mailto:xiarui091@gmail.com?subject=Pro%20waitlist&amp;body=Please%20let%20me%20know%20when%20Pro%20launches." class="btn btn-primary mt-10 w-full">Join the waitlist</a>
         </div>
         <div class="plan plan-invited relative p-8 sm:p-10" data-plan-card="invited">
           <span class="chip absolute right-6 top-6 bg-teal/15 text-teal" data-your-plan hidden>Your plan</span>
           <h3 class="text-[22px]">Invited</h3>
-          <p class="mt-4 flex items-baseline gap-2"><span class="font-display text-[48px] font-bold leading-none tracking-[-0.03em]">$0</span><span class="text-mist">with a code</span></p>
+          <p class="mt-4 flex items-baseline gap-2"><span class="font-display text-[48px] font-bold leading-none tracking-[-0.03em]">€0</span><span class="text-mist">with a code</span></p>
           <p class="mt-3 text-[15px] text-mist">Pro access for people we've invited.</p>
           <ul class="mt-8 space-y-3 text-[15px]">
             <li class="flex gap-3"><svg class="mt-1 shrink-0" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#10B981" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>Unlimited rewrites</li>
@@ -769,6 +790,28 @@ Excited for this next chapter and can't wait to see what the future holds!
 
 #NewJob #Blessed #Grateful #Design #UX #Career #Motivation #Hired`;
 
+  // What the visitor is writing: each kind has its own preview header, placeholder and sample text.
+  const KINDS = {
+    post: { title: 'Your post', sub: 'How it reads in the feed', sample: DRAFT,
+      placeholder: 'Paste your LinkedIn draft here. Bullet points or a rough paragraph both work.' },
+    profile: { title: 'Your profile', sub: 'Headline, About, experience or achievements',
+      placeholder: 'Paste your headline, your About section, or a job from your experience.',
+      sample: `Marketing person with 6 years experience. I do social media, campaigns and some data stuff. I worked at two agencies and now I want to move to a tech company. Hard worker and team player, I like learning new things.` },
+    message: { title: 'Your message', sub: 'Connection request, follow-up or outreach',
+      placeholder: 'Paste a connection request, a reply to a recruiter, a follow-up or a message to a client.',
+      sample: `hi, i saw your profile and i want to connect. im looking for a job in product design and maybe you can help me or know someone who is hiring. thanks` },
+  };
+  // Profile: which section the visitor is rewriting, so the AI never has to guess.
+  const SECTIONS = {
+    headline: { sub: 'Your headline', sample: 'marketing manager, social media, campaigns, data',
+      placeholder: 'Paste your current headline, or your role and main skills.' },
+    about: { sub: 'Your About section', sample: KINDS.profile.sample,
+      placeholder: 'Paste your About section, or a few sentences about you and what you want next.' },
+    experience: { sub: 'A job from your experience', sample: 'At my last job I was responsible for the social media accounts, I made campaigns, I did the monthly reports and I trained 2 juniors.',
+      placeholder: 'Paste a job description, your duties, or your achievements.' },
+  };
+  const isSample = v => [...Object.values(KINDS), ...Object.values(SECTIONS)].some(k => k.sample === v);
+
   const MAX_CHARS = 3000;
   const draft = document.getElementById('draft');
   const body = document.getElementById('post-body');
@@ -779,8 +822,8 @@ Excited for this next chapter and can't wait to see what the future holds!
   const errorEl = document.getElementById('demo-error');
   const progress = document.getElementById('progress');
   const stateChip = document.getElementById('state-chip'), stateLabel = document.getElementById('state-label');
-  let tone = 'professional', rewritten = false, busy = false, result = '';
-  const cache = new Map(); // `${tone}\n${draft}` -> rewrite, so flipping tones back doesn't spend a request
+  let kind = 'post', section = 'about', tone = 'natural', rewritten = false, busy = false, result = '';
+  const cache = new Map(); // `${kind}\n${tone}\n${draft}` -> rewrite, so flipping back doesn't spend a request
 
   const esc = s => s.replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
   const words = t => t.replace(/#\w+/g, '').split(/\s+/).filter(w => /[\p{L}\p{N}]/u.test(w)).length;
@@ -842,7 +885,7 @@ Excited for this next chapter and can't wait to see what the future holds!
     const text = draft.value.trim();
     if (!text) { showError('Paste a draft first.'); draft.focus(); return; }
     showError('');
-    const key = `${tone}\n${text}`;
+    const key = `${kind}:${section}\n${tone}\n${text}`;
     if (cache.has(key)) { show(cache.get(key)); return true; }
 
     setBusy(true);
@@ -851,7 +894,7 @@ Excited for this next chapter and can't wait to see what the future holds!
       const res = await fetch('/api/rewrite', {
         method: 'POST',
         headers: apiHeaders(),
-        body: JSON.stringify({ text, tone }),
+        body: JSON.stringify({ text, tone, kind, section }),
         signal: AbortSignal.timeout(45000),
       });
       const data = await res.json().catch(() => ({}));
@@ -877,10 +920,10 @@ Excited for this next chapter and can't wait to see what the future holds!
     if (!rewritten) return runRewrite();
     progress.classList.remove('done');
     setRewrittenUI(false);
-    if (draft.value !== DRAFT) draft.focus(); // focusing would clear the sample they just rewrote
+    if (!isSample(draft.value)) draft.focus(); // focusing would clear the sample they just rewrote
   });
 
-  const tones = [...document.querySelectorAll('.tone')];
+  const tones = [...document.querySelectorAll('#tones .tone')];
   const selectTone = name => { tone = name; tones.forEach(x => x.setAttribute('aria-checked', String(x.dataset.tone === name))); };
   tones.forEach(t => t.addEventListener('click', async () => {
     if (busy || t.dataset.tone === tone) return;
@@ -890,9 +933,46 @@ Excited for this next chapter and can't wait to see what the future holds!
     if (rewritten && !(await runRewrite())) selectTone(prev);
   }));
 
-  // The sample post works like a placeholder: it clears on focus and comes back if the box is left empty.
-  draft.addEventListener('focus', () => { if (draft.value === DRAFT) { draft.value = ''; counts(''); } });
-  draft.addEventListener('blur', () => { if (!draft.value.trim()) { draft.value = DRAFT; counts(DRAFT); } });
+  // Post / Profile / Message. With an untouched sample the sample follows the kind; with the
+  // visitor's own text, a rewrite on screen is redone for the new kind.
+  const kindBtns = [...document.querySelectorAll('#kinds .tone')];
+  const sectionBtns = [...document.querySelectorAll('#sections .tone')];
+  // Header, placeholder and sample for what's selected now (profile: per section).
+  const current = () => (kind === 'profile' ? { ...KINDS.profile, ...SECTIONS[section] } : KINDS[kind]);
+  function renderKind() {
+    kindBtns.forEach(x => x.setAttribute('aria-checked', String(x.dataset.kind === kind)));
+    sectionBtns.forEach(x => x.setAttribute('aria-checked', String(x.dataset.section === section)));
+    document.getElementById('section-row').hidden = kind !== 'profile';
+    document.getElementById('kind-title').textContent = current().title;
+    document.getElementById('kind-sub').textContent = current().sub;
+    draft.placeholder = current().placeholder;
+    hc.parentElement.hidden = kind !== 'post'; // hashtags only matter in posts
+  }
+  // With an untouched sample, the sample follows the choice; with the visitor's own text, a rewrite
+  // on screen is redone for the new choice (and the choice reverts if that fails).
+  async function choose(update, revert) {
+    update(); renderKind(); showError('');
+    if (isSample(draft.value) || !draft.value.trim()) {
+      draft.value = current().sample;
+      progress.classList.remove('done');
+      setRewrittenUI(false);
+      counts(draft.value);
+    } else if (rewritten && !(await runRewrite())) { revert(); renderKind(); }
+  }
+  kindBtns.forEach(b => b.addEventListener('click', () => {
+    if (busy || b.dataset.kind === kind) return;
+    const prev = kind;
+    choose(() => { kind = b.dataset.kind; }, () => { kind = prev; });
+  }));
+  sectionBtns.forEach(b => b.addEventListener('click', () => {
+    if (busy || b.dataset.section === section) return;
+    const prev = section;
+    choose(() => { section = b.dataset.section; }, () => { section = prev; });
+  }));
+
+  // The sample works like a placeholder: it clears on focus and comes back if the box is left empty.
+  draft.addEventListener('focus', () => { if (isSample(draft.value)) { draft.value = ''; counts(''); } });
+  draft.addEventListener('blur', () => { if (!draft.value.trim()) { draft.value = current().sample; counts(draft.value); } });
   draft.addEventListener('input', () => { counts(draft.value); showError(''); });
   draft.addEventListener('keydown', e => {
     if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) { e.preventDefault(); runRewrite(); }
