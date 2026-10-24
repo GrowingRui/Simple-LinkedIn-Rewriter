@@ -70,6 +70,12 @@ Want to know when Pro launches? [Join the waitlist](mailto:xiarui091@gmail.com?s
 > "I like that I can focus on the message instead of worrying about how to phrase every sentence. It makes polishing my writing feel effortless."
 > **Marvin Luelmo**, Sales Consultant
 
+> "Ich bin sehr zufrieden mit Simple LinkedIn Rewriter! Das Tool hilft dabei, LinkedIn-Beiträge schnell und unkompliziert zu verbessern und professioneller zu formulieren, ohne die ursprüngliche Aussage zu verändern. Die Benutzeroberfläche ist übersichtlich und intuitiv, sodass die Nutzung besonders einfach und effizient ist. Absolut empfehlenswert für alle, die ihre LinkedIn-Beiträge optimieren möchten!"
+> **Markus T.**
+
+> "Simple LinkedIn Rewriter ist ein wirklich praktisches und benutzerfreundliches Tool! Es hilft dabei, LinkedIn-Beiträge schnell zu verbessern und professioneller zu gestalten. Besonders gut gefällt mir, wie einfach die Bedienung ist und wie natürlich die überarbeiteten Texte klingen. Sehr empfehlenswert für alle, die ihre LinkedIn-Präsenz verbessern möchten!"
+> **Saskja T.**
+
 ## Coming next
 
 - **Pro plan** with unlimited rewrites
