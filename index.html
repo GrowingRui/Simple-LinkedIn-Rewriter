@@ -39,6 +39,8 @@
     setTimeout(() => { if (!window.gsap) document.documentElement.classList.remove('motion'); }, 3000);
   }
 </script>
+<!-- English / German (assets/i18n.js): picks the language before the page paints -->
+<script src="assets/i18n.js"></script>
 <style>
   :root {
     --navy: #091B33; --navy-raised: #0F2547; --navy-line: #1D3559;
@@ -270,9 +272,15 @@
   .faq summary:hover h3 { opacity: .8; }
   .faq summary:active .plus { transform: scale(.85); }
   .faq details[open] .answer { animation: panelIn .45s var(--ease-out); }
+  /* the whole row toggles, not just the question text: the summary reaches into the row's padding */
+  .faq summary { padding-top: 24px; margin-top: -24px; }
+  .faq details:not([open]) summary { padding-bottom: 24px; margin-bottom: -24px; }
+  .faq details[open] summary { padding-bottom: 12px; margin-bottom: -12px; }
 
   .footlink { color: var(--mist); font-size: 14px; border-radius: 4px; transition: opacity .2s ease; }
   .footlink:hover { color: #fff; }
+  /* bigger tap area without moving anything */
+  .footlink, #plan-invite { display: inline-block; padding-block: 6px; margin-block: -6px; }
   .footlink:active { opacity: .7; }
   .footlink:focus-visible { outline: 2px solid var(--teal); outline-offset: 3px; }
 
@@ -315,7 +323,7 @@
   <div class="nav-bg"></div>
   <nav class="wrap relative flex h-[80px] items-center justify-between" aria-label="Main">
     <a href="#top" class="focusable rounded-md transition-opacity duration-200 hover:opacity-90 active:opacity-75" aria-label="Simple LinkedIn Rewriter home">
-      <img src="brand_assets/logo-transparent.png" alt="Simple LinkedIn Rewriter" class="h-10 w-auto md:h-12">
+      <picture class="block shrink-0"><source media="(max-width: 419px)" srcset="brand_assets/logo-icon.png"><img src="brand_assets/logo-transparent.png" alt="Simple LinkedIn Rewriter" class="h-10 w-auto md:h-12"></picture>
     </a>
     <div class="hidden items-center gap-8 md:flex">
       <a class="navlink" href="#how"><span>How it works</span></a>
@@ -324,6 +332,10 @@
       <a class="navlink" href="#faq"><span>FAQ</span></a>
     </div>
     <div class="flex items-center gap-4 sm:gap-6">
+      <div class="lang-switch lang-switch-nav" role="group" aria-label="Language">
+        <button type="button" data-set-lang="en" aria-pressed="true" lang="en" aria-label="English">EN</button>
+        <button type="button" data-set-lang="de" aria-pressed="false" lang="de" aria-label="Deutsch">DE</button>
+      </div>
       <button type="button" id="nav-signin" class="navlink" hidden><span>Sign in</span></button>
       <button type="button" id="nav-account" class="avatar-btn" hidden aria-label="Your account"><span class="avatar" id="nav-avatar" style="--a:#1A73E8;--b:#10B981"></span></button>
       <a href="#top" data-focus-demo class="btn btn-primary btn-sm">Try it free</a>
@@ -398,7 +410,7 @@
               </div>
               <label for="draft" class="sr-only">Your LinkedIn draft</label>
               <textarea id="draft" maxlength="3000" spellcheck="true" class="draft-input mt-4 h-[280px] text-[15px] sm:h-[300px]" placeholder="Paste your LinkedIn draft here. Bullet points or a rough paragraph both work."></textarea>
-              <div id="post-body" hidden class="post-body mt-4 min-h-[280px] text-[15px] leading-[1.6] sm:min-h-[300px]" aria-live="polite"></div>
+              <div id="post-body" hidden class="post-body mt-4 min-h-[280px] text-[15px] leading-[1.6] sm:min-h-[300px]" data-no-i18n aria-live="polite"></div>
             </div>
           </article>
 
@@ -529,7 +541,7 @@
         <li class="cliche">I'm thrilled to share</li>
         <li class="cliche">Thoughts? 👇</li>
         <li class="cliche">This is a game-changer</li>
-        <li class="cliche">I couldn't have done it without each and every one of you</li>
+        <li class="cliche">I couldn't have done it without you</li>
         <li class="cliche">Hot take:</li>
       </ul>
     </div>
@@ -546,33 +558,33 @@
       <div class="mt-16 grid gap-6 md:grid-cols-2 lg:gap-8">
         <figure class="review">
           <div class="stars" role="img" aria-label="5 out of 5 stars"></div>
-          <blockquote class="mt-4">I often know what I want to say on LinkedIn, but finding the right words takes time. This tool helps me turn rough thoughts into clear, professional posts in seconds.</blockquote>
-          <figcaption class="person"><span class="avatar" style="--a:#1A73E8;--b:#10B981">AS</span><span><b>Adrian Sanchez</b>Marketing Manager</span></figcaption>
+          <blockquote class="mt-4" data-no-i18n>I often know what I want to say on LinkedIn, but finding the right words takes time. This tool helps me turn rough thoughts into clear, professional posts in seconds.</blockquote>
+          <figcaption class="person" data-no-i18n><span class="avatar" style="--a:#1A73E8;--b:#10B981">AS</span><span><b>Adrian Sanchez</b>Marketing Manager</span></figcaption>
         </figure>
         <figure class="review">
           <div class="stars" role="img" aria-label="5 out of 5 stars"></div>
-          <blockquote class="mt-4">No complicated settings or unnecessary steps. I enter my text, rewrite it, and get a more polished version that still sounds like me.</blockquote>
-          <figcaption class="person"><span class="avatar" style="--a:#10B981;--b:#0F2547">MH</span><span><b>Mike Haccke</b>Software Engineer</span></figcaption>
+          <blockquote class="mt-4" data-no-i18n>No complicated settings or unnecessary steps. I enter my text, rewrite it, and get a more polished version that still sounds like me.</blockquote>
+          <figcaption class="person" data-no-i18n><span class="avatar" style="--a:#10B981;--b:#0F2547">MH</span><span><b>Mike Haccke</b>Software Engineer</span></figcaption>
         </figure>
         <figure class="review">
           <div class="stars" role="img" aria-label="5 out of 5 stars"></div>
-          <blockquote class="mt-4">Whether I’m refining a LinkedIn post or improving a professional message, this tool gives me a useful starting point and saves me time.</blockquote>
-          <figcaption class="person"><span class="avatar" style="--a:#155FC2;--b:#1A73E8">SZ</span><span><b>Simon Zieger</b>Business Development Manager</span></figcaption>
+          <blockquote class="mt-4" data-no-i18n>Whether I’m refining a LinkedIn post or improving a professional message, this tool gives me a useful starting point and saves me time.</blockquote>
+          <figcaption class="person" data-no-i18n><span class="avatar" style="--a:#155FC2;--b:#1A73E8">SZ</span><span><b>Simon Zieger</b>Business Development Manager</span></figcaption>
         </figure>
         <figure class="review">
           <div class="stars" role="img" aria-label="5 out of 5 stars"></div>
-          <blockquote class="mt-4">I like that I can focus on the message instead of worrying about how to phrase every sentence. It makes polishing my writing feel effortless.</blockquote>
-          <figcaption class="person"><span class="avatar" style="--a:#0F2547;--b:#10B981">ML</span><span><b>Marvin Luelmo</b>Sales Consultant</span></figcaption>
+          <blockquote class="mt-4" data-no-i18n>I like that I can focus on the message instead of worrying about how to phrase every sentence. It makes polishing my writing feel effortless.</blockquote>
+          <figcaption class="person" data-no-i18n><span class="avatar" style="--a:#0F2547;--b:#10B981">ML</span><span><b>Marvin Luelmo</b>Sales Consultant</span></figcaption>
         </figure>
         <figure class="review" lang="de">
           <div class="stars" role="img" aria-label="5 out of 5 stars" lang="en"></div>
-          <blockquote class="mt-4">Ich bin sehr zufrieden mit Simple LinkedIn Rewriter! Das Tool hilft dabei, LinkedIn-Beiträge schnell und unkompliziert zu verbessern und professioneller zu formulieren, ohne die ursprüngliche Aussage zu verändern. Die Benutzeroberfläche ist übersichtlich und intuitiv, sodass die Nutzung besonders einfach und effizient ist. Absolut empfehlenswert für alle, die ihre LinkedIn-Beiträge optimieren möchten!</blockquote>
-          <figcaption class="person"><span class="avatar" style="--a:#1A73E8;--b:#0F2547">MT</span><span><b>Markus T.</b></span></figcaption>
+          <blockquote class="mt-4" data-no-i18n>Ich bin sehr zufrieden mit Simple LinkedIn Rewriter! Das Tool hilft dabei, LinkedIn-Beiträge schnell und unkompliziert zu verbessern und professioneller zu formulieren, ohne die ursprüngliche Aussage zu verändern. Die Benutzeroberfläche ist übersichtlich und intuitiv, sodass die Nutzung besonders einfach und effizient ist. Absolut empfehlenswert für alle, die ihre LinkedIn-Beiträge optimieren möchten!</blockquote>
+          <figcaption class="person" data-no-i18n><span class="avatar" style="--a:#1A73E8;--b:#0F2547">MT</span><span><b>Markus T.</b></span></figcaption>
         </figure>
         <figure class="review" lang="de">
           <div class="stars" role="img" aria-label="5 out of 5 stars" lang="en"></div>
-          <blockquote class="mt-4">Simple LinkedIn Rewriter ist ein wirklich praktisches und benutzerfreundliches Tool! Es hilft dabei, LinkedIn-Beiträge schnell zu verbessern und professioneller zu gestalten. Besonders gut gefällt mir, wie einfach die Bedienung ist und wie natürlich die überarbeiteten Texte klingen. Sehr empfehlenswert für alle, die ihre LinkedIn-Präsenz verbessern möchten!</blockquote>
-          <figcaption class="person"><span class="avatar" style="--a:#10B981;--b:#155FC2">ST</span><span><b>Saskja T.</b></span></figcaption>
+          <blockquote class="mt-4" data-no-i18n>Simple LinkedIn Rewriter ist ein wirklich praktisches und benutzerfreundliches Tool! Es hilft dabei, LinkedIn-Beiträge schnell zu verbessern und professioneller zu gestalten. Besonders gut gefällt mir, wie einfach die Bedienung ist und wie natürlich die überarbeiteten Texte klingen. Sehr empfehlenswert für alle, die ihre LinkedIn-Präsenz verbessern möchten!</blockquote>
+          <figcaption class="person" data-no-i18n><span class="avatar" style="--a:#10B981;--b:#155FC2">ST</span><span><b>Saskja T.</b></span></figcaption>
         </figure>
       </div>
     </div>
@@ -694,6 +706,10 @@
       <a class="footlink" href="privacy.html">Privacy</a>
       <a class="footlink" href="terms.html">Terms</a>
     </nav>
+    <div class="lang-switch" role="group" aria-label="Language">
+      <button type="button" data-set-lang="en" aria-pressed="true" lang="en" aria-label="English">EN</button>
+      <button type="button" data-set-lang="de" aria-pressed="false" lang="de" aria-label="Deutsch">DE</button>
+    </div>
     <p class="text-[13px] text-mist/70">© 2026 Simple LinkedIn Rewriter. Not affiliated with LinkedIn.</p>
   </div>
 </footer>
@@ -830,7 +846,7 @@
       <span class="avatar avatar-lg" id="account-avatar" style="--a:#1A73E8;--b:#10B981" aria-hidden="true"></span>
       <div class="min-w-0">
         <h2 id="account-title" class="text-[26px]">Your account</h2>
-        <p id="account-email" class="truncate text-[15px] text-mist"></p>
+        <p id="account-email" data-no-i18n class="truncate text-[15px] text-mist"></p>
       </div>
     </div>
     <dl class="account-facts mt-8">
@@ -894,7 +910,8 @@ Excited for this next chapter and can't wait to see what the future holds!
     experience: { sub: 'A job from your experience', sample: 'At my last job I was responsible for the social media accounts, I made campaigns, I did the monthly reports and I trained 2 juniors.',
       placeholder: 'Paste a job description, your duties, or your achievements.' },
   };
-  const isSample = v => [...Object.values(KINDS), ...Object.values(SECTIONS)].some(k => k.sample === v);
+  const L = window.slrI18n;
+  const isSample = v => [...Object.values(KINDS), ...Object.values(SECTIONS)].some(k => L.samples(k.sample).includes(v));
 
   const MAX_CHARS = 3000;
   const draft = document.getElementById('draft');
@@ -1038,7 +1055,7 @@ Excited for this next chapter and can't wait to see what the future holds!
   async function choose(update, revert) {
     update(); renderKind(); showError('');
     if (isSample(draft.value) || !draft.value.trim()) {
-      draft.value = current().sample;
+      draft.value = L.sample(current().sample);
       progress.classList.remove('done');
       setRewrittenUI(false);
       counts(draft.value);
@@ -1058,7 +1075,7 @@ Excited for this next chapter and can't wait to see what the future holds!
 
   // The sample works like a placeholder: it clears on focus and comes back if the box is left empty.
   draft.addEventListener('focus', () => { if (isSample(draft.value)) { draft.value = ''; counts(''); } });
-  draft.addEventListener('blur', () => { if (!draft.value.trim()) { draft.value = current().sample; counts(draft.value); } });
+  draft.addEventListener('blur', () => { if (!draft.value.trim()) { draft.value = L.sample(current().sample); counts(draft.value); } });
   draft.addEventListener('input', () => { counts(draft.value); showError(''); saveDraftSoon(); });
   draft.addEventListener('keydown', e => {
     if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) { e.preventDefault(); runRewrite(); }
@@ -1257,8 +1274,12 @@ Excited for this next chapter and can't wait to see what the future holds!
     return true;
   }
 
-  if (!restoreDraft()) draft.value = DRAFT;
+  if (!restoreDraft()) draft.value = L.sample(DRAFT);
   counts(draft.value);
+  // Switching language swaps an untouched sample for the same sample in the other language.
+  document.addEventListener('slr:lang', () => {
+    if (isSample(draft.value)) { draft.value = L.sample(current().sample); counts(draft.value); }
+  });
 
   // ---------- Examples ----------
   const EXAMPLES = [
@@ -1342,6 +1363,7 @@ Excited for this next chapter and can't wait to see what the future holds!
     }), { threshold: 0.4 }).observe(cl);
   } else cl.classList.add('struck');
 </script>
+<script>slrI18n.start();</script>
 <!-- Optional sign-in: Supabase client (pinned, integrity-checked) + assets/auth.js. The page works without them. -->
 <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.3/dist/umd/supabase.js" integrity="sha384-BWcjm9OdFth9TbhCxZPdm+gAOUMAzQy9nmTs12ioXdCcbVnJaPMn+fMUoQCLt60R" crossorigin="anonymous"></script>
 <script defer src="assets/auth.js"></script>

@@ -13,6 +13,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Outfit:wght@500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="assets/site.css">
 <link rel="stylesheet" href="assets/legal.css">
+<script src="assets/i18n.js"></script>
 <script>
   window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
   if (!/^(localhost|127\.0\.0\.1)$/.test(location.hostname)) {
@@ -26,9 +27,15 @@
 <header class="legal-head">
   <nav class="wrap relative z-10 flex h-[80px] items-center justify-between" aria-label="Main">
     <a href="./" class="focusable rounded-md transition-opacity duration-200 hover:opacity-90 active:opacity-75" aria-label="Simple LinkedIn Rewriter home">
-      <img src="brand_assets/logo-transparent.png" alt="Simple LinkedIn Rewriter" class="h-10 w-auto md:h-12">
+      <picture class="block shrink-0"><source media="(max-width: 419px)" srcset="brand_assets/logo-icon.png"><img src="brand_assets/logo-transparent.png" alt="Simple LinkedIn Rewriter" class="h-10 w-auto md:h-12"></picture>
     </a>
-    <a href="./#demo" class="btn">Try it free</a>
+    <div class="flex items-center gap-4 sm:gap-6">
+      <div class="lang-switch lang-switch-nav" role="group" aria-label="Language">
+        <button type="button" data-set-lang="en" aria-pressed="true" lang="en" aria-label="English">EN</button>
+        <button type="button" data-set-lang="de" aria-pressed="false" lang="de" aria-label="Deutsch">DE</button>
+      </div>
+      <a href="./#demo" class="btn">Try it free</a>
+    </div>
   </nav>
   <div class="wrap relative z-10 pb-[64px] pt-[48px] lg:pb-[96px] lg:pt-[64px]">
     <a href="./" class="backlink">
@@ -41,7 +48,7 @@
 </header>
 
 <main class="wrap py-[64px] lg:py-[96px]">
-  <article class="prose">
+  <article class="prose" data-lang-only="en">
     <div class="summary">
       <p><strong>The short version:</strong> your posts stay yours. The rewriter uses AI, so read every rewrite before you publish it, because you're responsible for what you post. Use the free plan fairly, and don't try to get around its limits.</p>
     </div>
@@ -87,6 +94,53 @@
     <h2>Contact</h2>
     <p>Questions about these terms: <a href="mailto:xiarui091@gmail.com">xiarui091@gmail.com</a>.</p>
   </article>
+  <article class="prose" data-lang-only="de" lang="de" hidden>
+    <div class="summary">
+      <p><strong>Kurz gesagt:</strong> Deine Beiträge gehören dir. Der Rewriter nutzt KI. Lies also jede Umschreibung, bevor du sie veröffentlichst, denn du bist für das verantwortlich, was du postest. Nutze den kostenlosen Plan fair und versuche nicht, seine Limits zu umgehen.</p>
+    </div>
+
+    <h2>Nutzung der Website</h2>
+    <p>Mit der Nutzung von Simple LinkedIn Rewriter akzeptierst du diese Bedingungen. Wenn du nicht einverstanden bist, nutze die Website bitte nicht. Du musst mindestens 16 Jahre alt sein.</p>
+
+    <h2>Deine Inhalte</h2>
+    <ul>
+      <li>Alle Rechte an den Entwürfen, die du einfügst, und an den Umschreibungen, die du zurückbekommst, bleiben bei dir.</li>
+      <li>Du erlaubst uns, deinen Entwurf an unsere KI-Anbieter zu schicken, um die Umschreibung zu erstellen, wie in der <a href="privacy.html">Datenschutzerklärung</a> beschrieben. Danach speichern wir ihn nicht.</li>
+      <li>Reiche nur Text ein, den du verwenden darfst. Reiche nichts Rechtswidriges ein und keine persönlichen oder vertraulichen Informationen über andere ohne deren Erlaubnis.</li>
+    </ul>
+
+    <h2>Von KI geschriebener Text</h2>
+    <p>Umschreibungen werden von KI erstellt. Sie können Fehler enthalten, deine Aussage verändern oder allgemeine Formulierungen ergänzen, die du nicht geschrieben hast. <strong>Prüfe jede Umschreibung, bevor du sie veröffentlichst.</strong> Du entscheidest, was du postest, und bist dafür verantwortlich.</p>
+
+    <h2>Pläne und faire Nutzung</h2>
+    <ul>
+      <li><strong>Kostenlos:</strong> 5 Umschreibungen pro Tag, zurückgesetzt um Mitternacht (UTC). Wir können dieses Limit ändern.</li>
+      <li><strong>Eingeladen:</strong> Einladungscodes geben unbegrenzte Umschreibungen in dem Browser-Tab, in dem du sie eingibst. Codes sind für die Personen gedacht, denen wir sie geben. Wir können einen Code jederzeit ändern oder zurückziehen.</li>
+      <li><strong>Pro:</strong> noch nicht verfügbar. Bevor wir Zahlungen annehmen, ergänzen wir hier die Bedingungen für Abrechnung und Kündigung.</li>
+    </ul>
+    <p>Bitte versuche nicht, die Limits zu umgehen, Anfragen zu automatisieren, den Dienst zu überlasten oder damit Spam oder irreführende Inhalte zu erzeugen. Wir können Zugriffe sperren, die das tun.</p>
+
+    <h2>Konten</h2>
+    <ul>
+      <li>Ein Konto ist freiwillig. Du meldest dich mit deiner E-Mail-Adresse und einem Passwort an. Halte dein Passwort geheim und teile dein Konto nicht.</li>
+      <li>Nutze eine E-Mail-Adresse, die dir gehört und auf die du Zugriff behältst, denn damit meldest du dich an. Ein Konto pro Person.</li>
+      <li>Ein im Konto gespeicherter Einladungszugang gilt, bis du dich abmeldest oder zum kostenlosen Plan wechselst, und endet, wenn wir den Einladungscode ändern oder zurückziehen.</li>
+      <li>Du kannst dein Konto jederzeit unter „Dein Konto → Konto löschen“ löschen. Wir können Konten sperren, die gegen diese Bedingungen verstoßen.</li>
+    </ul>
+
+    <h2>LinkedIn</h2>
+    <p>Diese Website ist nicht mit LinkedIn verbunden, wird nicht von LinkedIn unterstützt und steht in keiner Verbindung zu LinkedIn. LinkedIn ist eine Marke der LinkedIn Corporation. Wir fragen nie nach deinen LinkedIn-Zugangsdaten und posten nie etwas für dich.</p>
+
+    <h2>Verfügbarkeit und Haftung</h2>
+    <p>Die Website wird so bereitgestellt, wie sie ist, ohne Garantie, dass sie immer verfügbar, fehlerfrei oder für einen bestimmten Zweck geeignet ist. Sie hängt von externen KI-Anbietern ab und kann zeitweise langsam oder nicht erreichbar sein. Soweit gesetzlich zulässig, haften wir nicht für Schäden, die aus deiner Nutzung der Website oder des von ihr erzeugten Textes entstehen. Nichts hier schränkt Rechte ein, die gesetzlich nicht eingeschränkt werden können.</p>
+
+    <h2>Änderungen</h2>
+    <p>Wir können diese Bedingungen aktualisieren, zum Beispiel wenn Pro startet. Dann ändern wir das Datum oben. Wenn du die Website nach einer Änderung weiter nutzt, akzeptierst du die aktualisierten Bedingungen.</p>
+
+    <h2>Kontakt</h2>
+    <p>Fragen zu diesen Bedingungen: <a href="mailto:xiarui091@gmail.com">xiarui091@gmail.com</a>.</p>
+    <p><em>Dies ist eine Übersetzung. Bei Abweichungen gilt die englische Fassung.</em></p>
+  </article>
 </main>
 
 <footer class="border-t border-white/5 bg-navy">
@@ -99,9 +153,14 @@
       <a class="footlink" href="privacy.html">Privacy</a>
       <a class="footlink" href="terms.html" aria-current="page">Terms</a>
     </nav>
+    <div class="lang-switch" role="group" aria-label="Language">
+      <button type="button" data-set-lang="en" aria-pressed="true" lang="en" aria-label="English">EN</button>
+      <button type="button" data-set-lang="de" aria-pressed="false" lang="de" aria-label="Deutsch">DE</button>
+    </div>
     <p class="text-[13px] text-mist/70">© 2026 Simple LinkedIn Rewriter. Not affiliated with LinkedIn.</p>
   </div>
 </footer>
 
+<script>slrI18n.start();</script>
 </body>
 </html>

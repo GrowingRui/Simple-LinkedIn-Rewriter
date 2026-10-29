@@ -13,6 +13,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Outfit:wght@500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="assets/site.css">
 <link rel="stylesheet" href="assets/legal.css">
+<script src="assets/i18n.js"></script>
 <script>
   window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
   if (!/^(localhost|127\.0\.0\.1)$/.test(location.hostname)) {
@@ -26,9 +27,15 @@
 <header class="legal-head">
   <nav class="wrap relative z-10 flex h-[80px] items-center justify-between" aria-label="Main">
     <a href="./" class="focusable rounded-md transition-opacity duration-200 hover:opacity-90 active:opacity-75" aria-label="Simple LinkedIn Rewriter home">
-      <img src="brand_assets/logo-transparent.png" alt="Simple LinkedIn Rewriter" class="h-10 w-auto md:h-12">
+      <picture class="block shrink-0"><source media="(max-width: 419px)" srcset="brand_assets/logo-icon.png"><img src="brand_assets/logo-transparent.png" alt="Simple LinkedIn Rewriter" class="h-10 w-auto md:h-12"></picture>
     </a>
-    <a href="./#demo" class="btn">Try it free</a>
+    <div class="flex items-center gap-4 sm:gap-6">
+      <div class="lang-switch lang-switch-nav" role="group" aria-label="Language">
+        <button type="button" data-set-lang="en" aria-pressed="true" lang="en" aria-label="English">EN</button>
+        <button type="button" data-set-lang="de" aria-pressed="false" lang="de" aria-label="Deutsch">DE</button>
+      </div>
+      <a href="./#demo" class="btn">Try it free</a>
+    </div>
   </nav>
   <div class="wrap relative z-10 pb-[64px] pt-[48px] lg:pb-[96px] lg:pt-[64px]">
     <a href="./" class="backlink">
@@ -36,12 +43,12 @@
       Back to the rewriter
     </a>
     <h1 class="mt-6 text-[40px] sm:text-[56px]">Privacy policy</h1>
-    <p class="mt-4 text-[16px] text-mist">Last updated 23 October 2026</p>
+    <p class="mt-4 text-[16px] text-mist">Last updated 29 October 2026</p>
   </div>
 </header>
 
 <main class="wrap py-[64px] lg:py-[96px]">
-  <article class="prose">
+  <article class="prose" data-lang-only="en">
     <div class="summary">
       <p><strong>The short version:</strong> we don't keep your drafts. To rewrite a post we send it to an AI provider and pass the result straight back to you. To enforce the free daily limit we keep a random visitor ID, your IP address and a count of your rewrites for up to 48 hours. Accounts are optional; if you sign in, we also keep your email address. We don't sell data, show ads, or ask for your LinkedIn login.</p>
     </div>
@@ -112,6 +119,78 @@
     <h2>Changes to this policy</h2>
     <p>We'll update this page when we change what we collect, for example when Pro accounts and payments launch, and change the date at the top.</p>
   </article>
+  <article class="prose" data-lang-only="de" lang="de" hidden>
+    <div class="summary">
+      <p><strong>Kurz gesagt:</strong> Wir speichern deine Entwürfe nicht. Zum Umschreiben schicken wir deinen Text an einen KI-Anbieter und geben das Ergebnis direkt an dich zurück. Um das kostenlose Tageslimit durchzusetzen, speichern wir bis zu 48 Stunden lang eine zufällige Besucher-ID, deine IP-Adresse und die Anzahl deiner Umschreibungen. Ein Konto ist freiwillig; wenn du dich anmeldest, speichern wir zusätzlich deine E-Mail-Adresse. Wir verkaufen keine Daten, zeigen keine Werbung und fragen nie nach deinen LinkedIn-Zugangsdaten.</p>
+    </div>
+
+    <h2>Wer diese Website betreibt</h2>
+    <p>Simple LinkedIn Rewriter ist ein unabhängiges Projekt und nicht mit LinkedIn verbunden. Bei Fragen oder Anliegen zum Datenschutz schreib an <a href="mailto:xiarui091@gmail.com">xiarui091@gmail.com</a>.</p>
+
+    <h2>Was wir verarbeiten und warum</h2>
+
+    <h3>Die Entwürfe, die du umschreibst</h3>
+    <p>Wenn du auf „Umschreiben“ drückst, werden dein Entwurf und der gewählte Ton an unseren Server und von dort an einen KI-Anbieter geschickt, der die neue Fassung schreibt. Wir speichern Entwürfe und Umschreibungen weder in einer Datenbank noch in unseren Logs.</p>
+    <p>Damit deine Arbeit beim Neuladen oder Schließen des Tabs nicht verloren geht, bleibt der Entwurf, an dem du schreibst, im lokalen Speicher (Local Storage) deines eigenen Browsers. Er bleibt auf deinem Gerät und wird auf diesem Weg nie an uns geschickt. „Leeren“ oder ein leeres Textfeld löscht ihn.</p>
+    <p>Wir nutzen zwei Anbieter:</p>
+    <ul>
+      <li><strong>Groq</strong> übernimmt die Umschreibungen zuerst und verarbeitet deinen Text nach der <a href="https://groq.com/privacy-policy/" rel="noopener">Datenschutzerklärung von Groq</a>.</li>
+      <li><strong>Google Gemini API</strong> wird nur genutzt, wenn Groq nicht erreichbar ist. Wir nutzen die kostenlose Stufe von Gemini, und nach den <a href="https://ai.google.dev/gemini-api/terms" rel="noopener">Bedingungen von Google</a> können Inhalte, die an kostenlose Dienste geschickt werden, zur Verbesserung der Google-Produkte verwendet und von Menschen geprüft werden.</li>
+    </ul>
+    <p>Deshalb gilt: <strong>Füge keine vertraulichen Informationen ein</strong>, und auch keine persönlichen Angaben über andere Menschen, deren Weitergabe sie nicht zugestimmt haben.</p>
+
+    <h3>Kostenlose Umschreibungen zählen</h3>
+    <p>Ohne Konto bekommst du 5 Umschreibungen pro Tag. Um sie zu zählen, nutzen wir:</p>
+    <ul>
+      <li>ein Cookie namens <code>slr_vid</code> mit einer zufälligen ID, das bis zu ein Jahr gespeichert bleibt, damit wir deinen Browser wiedererkennen;</li>
+      <li>deine IP-Adresse, damit das Löschen von Cookies das Limit nicht für alle in einem Netzwerk zurücksetzt.</li>
+    </ul>
+    <p>Die Tageszählungen werden in unserer Datenbank (Upstash Redis) zu dieser ID und IP-Adresse gespeichert und nach 48 Stunden automatisch gelöscht. Ist die Datenbank nicht erreichbar, zählen wir stattdessen in einem signierten Cookie namens <code>slr_use</code>, das nach 2 Tagen abläuft.</p>
+    <p>Wenn jemand einen Einladungscode eingibt, zählen wir außerdem eine Stunde lang die Versuche pro IP-Adresse, damit niemand Codes erraten kann.</p>
+
+    <h3>Einladungszugang</h3>
+    <p>Gibst du ohne Anmeldung einen gültigen Einladungscode ein, speichert dein Browser-Tab einen signierten Zugangsnachweis im Sitzungsspeicher (Session Storage). Er wird gelöscht, wenn du den Tab schließt, und läuft in jedem Fall nach 12 Stunden ab. Bist du angemeldet, wird der Einladungszugang stattdessen in deinem Konto gespeichert und gilt, bis du dich abmeldest. In beiden Fällen kannst du ihn jederzeit mit „Zum kostenlosen Plan wechseln“ beenden.</p>
+
+    <h3>Konten (freiwillig)</h3>
+    <p>Du kannst die Website ohne Konto nutzen. Wenn du dich anmeldest:</p>
+    <ul>
+      <li><strong>Supabase</strong> betreibt die Anmeldung und speichert dein Konto: deine E-Mail-Adresse, wann du dich registriert und zuletzt angemeldet hast, und technische Anmeldedaten wie die IP-Adresse zur Sicherheit. Siehe die <a href="https://supabase.com/privacy" rel="noopener">Datenschutzerklärung von Supabase</a>.</li>
+      <li>Du erstellst ein Konto mit deiner E-Mail-Adresse und einem Passwort. Supabase speichert das Passwort nur als Hash; wir sehen es nie. Wenn du es zurücksetzen möchtest, schickt Supabase einen Link an diese Adresse.</li>
+      <li>Deine tägliche Anzahl an Umschreibungen und ein eventueller Einladungszugang sind in unserer Datenbank mit deiner Konto-ID verknüpft, damit sie dich auf alle Geräte begleiten. Tageszählungen werden nach 48 Stunden gelöscht.</li>
+      <li>Dein Browser speichert deine Anmeldesitzung im lokalen Speicher, bis du dich abmeldest.</li>
+    </ul>
+    <p>Du kannst dein Konto jederzeit selbst unter <strong>Dein Konto → Konto löschen</strong> löschen. Damit wird es zusammen mit dem verknüpften Einladungszugang und den Nutzungszählungen bei Supabase entfernt. Du kannst uns auch eine E-Mail schreiben, dann erledigen wir das für dich.</p>
+
+    <h3>Hosting, Schriften und Statistik</h3>
+    <ul>
+      <li><strong>Vercel</strong> hostet die Website. Wie jeder Webhoster verarbeitet Vercel technische Anfragedaten wie deine IP-Adresse und deinen Browsertyp, um die Seiten auszuliefern. Siehe die <a href="https://vercel.com/legal/privacy-policy" rel="noopener">Datenschutzerklärung von Vercel</a>.</li>
+      <li><strong>Vercel Web Analytics</strong> zählt Seitenaufrufe. Es nutzt keine Cookies und liefert uns Gesamtzahlen, keine Aufzeichnungen über einzelne Personen.</li>
+      <li><strong>Google Fonts</strong> liefert die Schriftarten aus. Dein Browser lädt sie also von Google, und Google erhält dabei deine IP-Adresse.</li>
+    </ul>
+
+    <h2>Was wir nicht tun</h2>
+    <ul>
+      <li>Wir verkaufen oder vermieten keine Daten und nutzen keine Werbe- oder Tracking-Cookies.</li>
+      <li>Wir fragen nie nach deinen LinkedIn-Zugangsdaten und posten nie in deinem Namen.</li>
+      <li>Für den kostenlosen Plan oder einen Einladungscode musst du weder Namen noch E-Mail-Adresse angeben. Die Anmeldung ist freiwillig.</li>
+    </ul>
+
+    <h2>Warum wir das verarbeiten dürfen</h2>
+    <p>Das Umschreiben deines Entwurfs ist der Dienst, den du anforderst, wenn du auf „Umschreiben“ drückst, und das Führen deines Kontos ist der Dienst, den du anforderst, wenn du dich anmeldest. Das Zählen der Nutzung, das Begrenzen von Code-Versuchen und einfache Hosting-Logs sind nötig, um den kostenlosen Plan fair zu betreiben und die Website sicher zu halten; das ist unser berechtigtes Interesse.</p>
+
+    <h2>Deine Wahlmöglichkeiten und Rechte</h2>
+    <ul>
+      <li>Du kannst die Cookies, den lokalen Speicher und den Sitzungsspeicher dieser Website jederzeit in deinen Browsereinstellungen löschen.</li>
+      <li>Je nachdem, wo du lebst, hast du das Recht auf Auskunft, Berichtigung und Löschung deiner personenbezogenen Daten, das Recht, der Verarbeitung zu widersprechen, und das Recht, dich bei deiner Datenschutzbehörde zu beschweren. Schreib uns, wir helfen dir. Abgesehen von der E-Mail-Adresse angemeldeter Nutzer speichern wir nur eine zufällige ID, eine IP-Adresse und kurzlebige Zählungen, es gibt also meist sehr wenig zu finden.</li>
+    </ul>
+
+    <h2>Kinder</h2>
+    <p>Diese Website ist nicht für Personen unter 16 Jahren gedacht.</p>
+
+    <h2>Änderungen dieser Erklärung</h2>
+    <p>Wir aktualisieren diese Seite, wenn sich ändert, was wir erfassen, zum Beispiel wenn Pro-Konten und Zahlungen starten, und passen dann das Datum oben an.</p>
+    <p><em>Dies ist eine Übersetzung. Bei Abweichungen gilt die englische Fassung.</em></p>
+  </article>
 </main>
 
 <footer class="border-t border-white/5 bg-navy">
@@ -124,9 +203,14 @@
       <a class="footlink" href="privacy.html" aria-current="page">Privacy</a>
       <a class="footlink" href="terms.html">Terms</a>
     </nav>
+    <div class="lang-switch" role="group" aria-label="Language">
+      <button type="button" data-set-lang="en" aria-pressed="true" lang="en" aria-label="English">EN</button>
+      <button type="button" data-set-lang="de" aria-pressed="false" lang="de" aria-label="Deutsch">DE</button>
+    </div>
     <p class="text-[13px] text-mist/70">© 2026 Simple LinkedIn Rewriter. Not affiliated with LinkedIn.</p>
   </div>
 </footer>
 
+<script>slrI18n.start();</script>
 </body>
 </html>
