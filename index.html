@@ -660,7 +660,7 @@
             <h3 class="text-[19px]">What happens to my drafts?</h3>
             <svg class="plus shrink-0" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1A73E8" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
           </summary>
-          <p class="answer mt-3 max-w-[40rem] text-[16px] text-slate">We don't store your drafts or rewrites. Your draft is sent to our AI provider to be rewritten and the result comes straight back to you. The <a href="privacy.html" class="focusable rounded font-medium text-royal underline decoration-royal/30 underline-offset-4 transition-opacity hover:opacity-80 active:opacity-60">privacy policy</a> has the details.</p>
+          <p class="answer mt-3 max-w-[40rem] text-[16px] text-slate">We don't store your drafts or rewrites. Your draft is sent to our AI provider to be rewritten and the result comes straight back to you. The draft you're working on is also kept in your own browser, so a refresh doesn't lose it; Clear removes it. The <a href="privacy.html" class="focusable rounded font-medium text-royal underline decoration-royal/30 underline-offset-4 transition-opacity hover:opacity-80 active:opacity-60">privacy policy</a> has the details.</p>
         </details>
         <details class="group py-6">
           <summary class="flex items-center justify-between gap-6">
@@ -1015,6 +1015,7 @@ Excited for this next chapter and can't wait to see what the future holds!
     selectTone(t.dataset.tone);
     // if the new tone fails, keep the selector in sync with the rewrite still on screen
     if (rewritten && !(await runRewrite())) selectTone(prev);
+    saveDraft();
   }));
 
   // Post / Profile / Message. With an untouched sample the sample follows the kind; with the
@@ -1042,6 +1043,7 @@ Excited for this next chapter and can't wait to see what the future holds!
       setRewrittenUI(false);
       counts(draft.value);
     } else if (rewritten && !(await runRewrite())) { revert(); renderKind(); }
+    saveDraft();
   }
   kindBtns.forEach(b => b.addEventListener('click', () => {
     if (busy || b.dataset.kind === kind) return;
@@ -1057,13 +1059,13 @@ Excited for this next chapter and can't wait to see what the future holds!
   // The sample works like a placeholder: it clears on focus and comes back if the box is left empty.
   draft.addEventListener('focus', () => { if (isSample(draft.value)) { draft.value = ''; counts(''); } });
   draft.addEventListener('blur', () => { if (!draft.value.trim()) { draft.value = current().sample; counts(draft.value); } });
-  draft.addEventListener('input', () => { counts(draft.value); showError(''); });
+  draft.addEventListener('input', () => { counts(draft.value); showError(''); saveDraftSoon(); });
   draft.addEventListener('keydown', e => {
     if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) { e.preventDefault(); runRewrite(); }
   });
 
   clearBtn.addEventListener('click', () => {
-    draft.value = ''; counts(''); showError(''); draft.focus();
+    draft.value = ''; counts(''); showError(''); saveDraft(); draft.focus();
   });
 
   copyBtn.addEventListener('click', async () => {
@@ -1227,8 +1229,36 @@ Excited for this next chapter and can't wait to see what the future holds!
     setTimeout(() => (rewritten ? btn : draft).focus({ preventScroll: true }), 500);
   }));
 
-  draft.value = DRAFT;
-  counts(DRAFT);
+  // ---------- Draft kept in this browser ----------
+  // The visitor's own draft (never the sample) stays in local storage, so a refresh or a closed
+  // tab doesn't lose it. It never leaves the device this way; Clear removes it.
+  const DRAFT_KEY = 'slr-draft';
+  let saveTimer;
+  function saveDraft() {
+    clearTimeout(saveTimer);
+    const text = draft.value;
+    try {
+      if (!text.trim() || isSample(text)) localStorage.removeItem(DRAFT_KEY);
+      else localStorage.setItem(DRAFT_KEY, JSON.stringify({ text, kind, section, tone }));
+    } catch {}
+  }
+  const saveDraftSoon = () => { clearTimeout(saveTimer); saveTimer = setTimeout(saveDraft, 400); };
+  addEventListener('pagehide', saveDraft);
+
+  function restoreDraft() {
+    let saved;
+    try { saved = JSON.parse(localStorage.getItem(DRAFT_KEY)); } catch {}
+    if (!saved || typeof saved.text !== 'string' || !saved.text.trim()) return false;
+    if (KINDS[saved.kind]) kind = saved.kind;
+    if (SECTIONS[saved.section]) section = saved.section;
+    if (tones.some(t => t.dataset.tone === saved.tone)) selectTone(saved.tone);
+    renderKind();
+    draft.value = saved.text.slice(0, MAX_CHARS);
+    return true;
+  }
+
+  if (!restoreDraft()) draft.value = DRAFT;
+  counts(draft.value);
 
   // ---------- Examples ----------
   const EXAMPLES = [

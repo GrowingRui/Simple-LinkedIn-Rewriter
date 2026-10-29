@@ -103,14 +103,25 @@
     const title = $('[data-hero-in="title"]');
     const support = $$('[data-hero-in]:not([data-hero-in="title"]):not([data-hero-in="demo"])');
     const demo = $('[data-hero-in="demo"]');
-    gsap.set([title, ...support, demo], { autoAlpha: 0 });
+    const all = [title, ...support, demo];
+    gsap.set(all, { autoAlpha: 0 });
     showPage(); // GSAP now holds them hidden; CSS can let go
+
+    // Safety net: the intro runs on animation frames, which some browsers, crawlers and link
+    // previews never deliver. If it hasn't finished in time, jump straight to the end state,
+    // so the headline and the rewriter can never stay hidden.
+    let intro, shown = false;
+    const failSafe = setTimeout(() => {
+      shown = true;
+      if (intro) intro.progress(1);
+      else gsap.set(all, { autoAlpha: 1, clearProps: 'transform' });
+    }, 3200);
 
     // Split into lines only once the display font is in, or line breaks would be wrong.
     const fontsReady = Promise.race([document.fonts?.ready, new Promise(r => setTimeout(r, 900))]);
-    fontsReady.then(() => ctx.add(() => {
+    fontsReady.then(() => !shown && ctx.add(() => {
       const split = SplitText.create(title, { type: 'lines', mask: 'lines' });
-      gsap.timeline({ onComplete: () => split.revert() }) // hand the heading back to normal text flow
+      intro = gsap.timeline({ onComplete: () => { clearTimeout(failSafe); split.revert(); } }) // hand the heading back to normal text flow
         .set(title, { autoAlpha: 1 })
         .from(split.lines, { yPercent: 110, duration: 1.15, stagger: 0.1 }, 0)
         .fromTo(demo, { autoAlpha: 0, y: 48, scale: 0.97 },
