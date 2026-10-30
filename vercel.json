@@ -1,0 +1,5 @@
+{
+  "rewrites": [{ "source": "/de", "destination": "/api/de" }],
+  "redirects": [{ "source": "/de/", "destination": "/de", "permanent": true }],
+  "functions": { "api/de.js": { "includeFiles": "index.html" } }
+}

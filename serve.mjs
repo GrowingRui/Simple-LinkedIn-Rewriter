@@ -30,6 +30,7 @@ createServer(async (req, res) => {
     let path = decodeURIComponent(new URL(req.url, 'http://x').pathname);
     const api = path.match(/^\/api\/([\w-]+)$/);
     if (api) { await runApi(api[1], req, res); return; }
+    if (path === '/de') { await runApi('de', req, res); return; } // vercel.json rewrite
     let file = normalize(join(root, path));
     if (!file.startsWith(normalize(root))) { res.writeHead(403).end(); return; }
     if ((await stat(file).catch(() => null))?.isDirectory()) file = join(file, 'index.html');

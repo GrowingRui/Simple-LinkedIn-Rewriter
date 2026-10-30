@@ -4,7 +4,8 @@
 // it). Switching back restores the English. Long legal text uses whole blocks instead:
 // [data-lang-only="en"|"de"] is shown only in that language (German starts out `hidden`, so
 // the English shows even without JavaScript).
-// Language: ?lang=de|en in the URL, else the visitor's last choice, else the browser's language.
+// Language: ?lang=de|en in the URL or the /de home page, else the visitor's last choice, else the
+// browser's language. On the home page, switching also moves between / and /de.
 (() => {
   const STORE = 'slr-lang';
   const root = document.documentElement;
@@ -12,6 +13,7 @@
   const DE = {
     // ---------- head ----------
     'Simple LinkedIn Rewriter': null, // same in both languages
+    'Free LinkedIn Post Rewriter | Simple LinkedIn Rewriter': 'Kostenloser LinkedIn-Post-Rewriter | Simple LinkedIn Rewriter',
     'Paste a rough LinkedIn draft and get a clear, human post back in seconds. Keeps your voice, cuts the clichés.':
       'Füge einen groben LinkedIn-Entwurf ein und erhalte in Sekunden einen klaren, menschlichen Beitrag. Deine Stimme bleibt, die Floskeln fliegen raus.',
     'Privacy policy | Simple LinkedIn Rewriter': 'Datenschutzerklärung | Simple LinkedIn Rewriter',
@@ -409,7 +411,9 @@ Ich freue mich auf dieses neue Kapitel und kann es kaum erwarten zu sehen, was d
 
   // ---------- which language ----------
   const pick = l => (l === 'de' || l === 'en' ? l : null);
-  let lang = pick(new URLSearchParams(location.search).get('lang'));
+  const HOME = { en: '/', de: '/de' };
+  const onHome = ['/', '/index.html', '/de'].includes(location.pathname);
+  let lang = pick(new URLSearchParams(location.search).get('lang')) || (location.pathname === '/de' ? 'de' : null);
   if (lang) { try { localStorage.setItem(STORE, lang); } catch {} }
   if (!lang) { try { lang = pick(localStorage.getItem(STORE)); } catch {} }
   if (!lang) lang = (navigator.languages || [navigator.language]).find(l => /^(de|en)\b/i.test(l || ''))?.slice(0, 2).toLowerCase() || 'en';
@@ -500,9 +504,9 @@ Ich freue mich auf dieses neue Kapitel und kann es kaum erwarten zu sehen, was d
 
   const head = {};
   function applyHead() {
-    head.title ??= document.title;
+    head.title ??= EN[document.title] || document.title; // /de arrives with a German head
     const meta = document.querySelector('meta[name="description"]');
-    if (meta) head.description ??= meta.content;
+    if (meta) head.description ??= EN[meta.content] || meta.content;
     document.title = lang === 'de' ? lookup(head.title) || head.title : head.title;
     if (meta) meta.content = lang === 'de' ? lookup(head.description) || head.description : head.description;
   }
@@ -519,6 +523,7 @@ Ich freue mich auf dieses neue Kapitel und kann es kaum erwarten zu sehen, was d
     if (!pick(l) || l === lang) return;
     lang = l;
     try { localStorage.setItem(STORE, l); } catch {}
+    if (onHome) history.replaceState(history.state, '', HOME[l] + location.hash);
     apply();
     document.dispatchEvent(new CustomEvent('slr:lang', { detail: l }));
     window.ScrollTrigger?.refresh(); // text lengths changed, so scroll positions did too

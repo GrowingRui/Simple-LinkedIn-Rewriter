@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+Disallow: /api/
+
+Sitemap: https://simplelinkedinrewriter.vercel.app/sitemap.xml
