@@ -144,6 +144,24 @@
   .post-body p { margin: 0 0 12px; }
   .post-body p:last-child { margin-bottom: 0; }
   .post-body .tag { color: var(--royal); font-weight: 500; }
+  /* the rewrite is editable in place: a quiet tint on hover says so, the card's ring shows focus */
+  .post-body[contenteditable] { outline: none; border-radius: 8px; margin-inline: -8px; padding-inline: 8px; cursor: text; transition: background-color .2s ease; }
+  .post-body[contenteditable]:hover { background-color: #F5F8FC; }
+  .post-body[contenteditable]:focus { background-color: transparent; }
+  .orig-body { color: #66758C; }
+  /* where LinkedIn folds a post in the feed; the label is CSS so it is never copied */
+  .fold { display: inline-block; margin-left: 6px; padding: 1px 9px; border-radius: 999px; font-size: 12.5px; font-weight: 600; line-height: 1.6; color: #66758C; background: #EEF2F7; box-shadow: inset 0 0 0 1px #DCE3EC; vertical-align: 1px; user-select: none; cursor: help; }
+  .fold::before { content: attr(data-label); }
+  /* Original / Rewritten switch on the white card */
+  .view-toggle { display: inline-flex; padding: 3px; gap: 2px; border-radius: 999px; background: #EEF2F7; }
+  .view-toggle button { position: relative; font-size: 12.5px; font-weight: 600; color: #66758C; padding: 5px 11px; border-radius: 999px; cursor: pointer; transition: transform .3s var(--spring), color .2s ease; }
+  .view-toggle button::before { content: ""; position: absolute; inset: 0; border-radius: inherit; background: #fff; box-shadow: 0 1px 2px rgba(9,27,51,.08), 0 4px 10px -4px rgba(26,115,232,.35); opacity: 0; transition: opacity .2s ease; }
+  .view-toggle button > span { position: relative; }
+  .view-toggle button:hover { color: #18263C; }
+  .view-toggle button:active { transform: scale(.95); }
+  .view-toggle button:focus-visible { outline: 2px solid var(--teal); outline-offset: 2px; }
+  .view-toggle button[aria-checked="true"] { color: #18263C; }
+  .view-toggle button[aria-checked="true"]::before { opacity: 1; }
   .post:focus-within { box-shadow: 0 1px 2px rgba(3,10,22,.2), 0 12px 32px -12px rgba(3,10,22,.5), 0 0 0 2px var(--teal); }
   .draft-input { display: block; width: 100%; resize: none; background: transparent; color: #18263C; font: inherit; line-height: 1.6; outline: none; transition: opacity .25s ease; }
   .draft-input::placeholder { color: #8796AB; }
@@ -399,18 +417,24 @@
           <article class="post mt-4 overflow-hidden sm:mt-5">
             <div class="h-1 w-full bg-slate-100"><div id="progress" class="progress h-full w-full"></div></div>
             <div class="p-5 sm:p-6">
-              <div class="flex items-center gap-3">
+              <div class="flex flex-wrap items-center gap-3">
                 <div class="grid h-11 w-11 shrink-0 place-items-center rounded-full text-white" style="background: linear-gradient(135deg, #1A73E8, #10B981);">
                   <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>
                 </div>
-                <div class="min-w-0">
+                <div class="min-w-[9rem] flex-1">
                   <p id="kind-title" class="text-[15px] font-semibold leading-tight text-[#18263C]">Your post</p>
                   <p id="kind-sub" class="truncate text-[13px] leading-tight text-[#66758C]">How it reads in the feed</p>
+                </div>
+                <div role="radiogroup" aria-label="Show" class="view-toggle ml-auto shrink-0" id="view" hidden>
+                  <button type="button" role="radio" aria-checked="false" data-view="before"><span>Original</span></button>
+                  <button type="button" role="radio" aria-checked="true" data-view="after"><span>Rewritten</span></button>
                 </div>
               </div>
               <label for="draft" class="sr-only">Your LinkedIn draft</label>
               <textarea id="draft" maxlength="3000" spellcheck="true" class="draft-input mt-4 h-[280px] text-[15px] sm:h-[300px]" placeholder="Paste your LinkedIn draft here. Bullet points or a rough paragraph both work."></textarea>
-              <div id="post-body" hidden class="post-body mt-4 min-h-[280px] text-[15px] leading-[1.6] sm:min-h-[300px]" data-no-i18n aria-live="polite"></div>
+              <div id="post-body" hidden class="post-body mt-4 min-h-[280px] text-[15px] leading-[1.6] sm:min-h-[300px]" data-no-i18n aria-live="polite" aria-labelledby="kind-title" aria-describedby="edit-hint" aria-multiline="true"></div>
+              <div id="orig-body" hidden class="post-body orig-body mt-4 min-h-[280px] text-[15px] leading-[1.6] sm:min-h-[300px]" data-no-i18n></div>
+              <p id="edit-hint" class="mt-4 text-[12.5px] leading-[1.5] text-[#8796AB]" hidden>Click the text to change anything before you copy it.</p>
             </div>
           </article>
 
@@ -421,8 +445,12 @@
               <span id="cc" class="chip bg-white/5 text-mist">0 / 3,000</span>
               <span id="delta" class="chip bg-teal/15 text-teal line-in" hidden></span>
             </div>
-            <div class="ml-auto flex items-center gap-2">
+            <div class="ml-auto flex flex-wrap items-center justify-end gap-2">
               <button type="button" id="clear" class="btn btn-secondary btn-sm">Clear</button>
+              <button type="button" id="again" class="btn btn-secondary btn-sm" hidden aria-label="New version" title="New version">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m12 3 1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9Z"/><path d="M19 16v4"/><path d="M17 18h4"/></svg>
+                <span class="hidden sm:inline">New version</span>
+              </button>
               <button type="button" id="copy" class="btn btn-secondary btn-sm" hidden>Copy</button>
               <button type="button" id="rewrite" class="btn btn-primary btn-sm">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a9 9 0 0 1-15.5 6.2L3 16"/><path d="M3 12a9 9 0 0 1 15.5-6.2L21 8"/><path d="M21 3v5h-5"/><path d="M3 21v-5h5"/></svg>
@@ -920,6 +948,9 @@ Excited for this next chapter and can't wait to see what the future holds!
   const delta = document.getElementById('delta');
   const btn = document.getElementById('rewrite'), btnLabel = document.getElementById('rewrite-label');
   const copyBtn = document.getElementById('copy'), clearBtn = document.getElementById('clear');
+  const againBtn = document.getElementById('again');
+  const origBody = document.getElementById('orig-body'), editHint = document.getElementById('edit-hint');
+  const viewEl = document.getElementById('view'), viewBtns = [...viewEl.querySelectorAll('button')];
   const errorEl = document.getElementById('demo-error');
   const progress = document.getElementById('progress');
   const stateChip = document.getElementById('state-chip'), stateLabel = document.getElementById('state-label');
@@ -935,18 +966,75 @@ Excited for this next chapter and can't wait to see what the future holds!
     cc.textContent = `${text.length.toLocaleString('en-US')} / 3,000`;
   }
 
-  function render(text) {
-    body.innerHTML = text.split(/\n{2,}/).map((p, i) =>
-      `<p class="line-in" style="animation-delay:${i * 90}ms">${esc(p).replace(/\n/g, '<br>').replace(/(#\w+)/g, '<span class="tag">$1</span>')}</p>`
-    ).join('');
+  // Roughly where LinkedIn folds a post in the feed: about 210 characters or three lines, whichever
+  // comes first. Returns the cut index (at a word end), or -1 if the whole post shows.
+  const FOLD_CHARS = 210;
+  function foldAt(text) {
+    let cut = -1, lines = 0;
+    for (let i = 0; i < text.length && cut < 0; i++) {
+      if (text[i] === '\n' && ++lines === 3) cut = i;
+      else if (i === FOLD_CHARS) cut = text.slice(0, i + 1).search(/\s\S*$/);
+    }
+    while (cut > 0 && /\s/.test(text[cut - 1])) cut--;
+    return cut > 0 && text.slice(cut).trim() ? cut : -1;
+  }
+  const FOLD = { en: ['…see more', 'LinkedIn shows about this much in the feed. Readers tap “…see more” for the rest.'],
+    de: ['…mehr anzeigen', 'So viel zeigt LinkedIn ungefähr im Feed. Für den Rest tippen Leser auf „…mehr anzeigen“.'] };
+  const MARK = '\u0001';
+  const paras = (text, animate) => text.split(/\n{2,}/).map((p, i) =>
+    `<p${animate ? ` class="line-in" style="animation-delay:${i * 90}ms"` : ''}>${esc(p).replace(/\n/g, '<br>').replace(/(#\w+)/g, '<span class="tag">$1</span>')}</p>`
+  ).join('');
+
+  function render(text, animate = true) {
+    const cut = kind === 'post' ? foldAt(text) : -1;
+    const [label, title] = FOLD[L.lang()] || FOLD.en;
+    body.innerHTML = paras(cut < 0 ? text : text.slice(0, cut) + MARK + text.slice(cut), animate)
+      .replace(MARK, `<span class="fold" contenteditable="false" data-label="${label}" title="${title}"></span>`);
+    origBody.innerHTML = paras(draft.value.trim(), false);
     counts(text);
   }
+
+  // The rewrite is edited in place, and Copy takes the edited text. The fold label is CSS, so it
+  // never ends up in innerText. Plain-text editing where the browser has it, so pastes stay plain.
+  const readBody = () => body.innerText.replace(/\u00a0/g, ' ').replace(/[ \t]+$/gm, '').replace(/\n{3,}/g, '\n\n').trim();
+  body.contentEditable = 'plaintext-only';
+  const EDITABLE = body.contentEditable === 'plaintext-only' ? 'plaintext-only' : 'true';
+  body.contentEditable = EDITABLE;
+  body.addEventListener('paste', e => {
+    e.preventDefault();
+    document.execCommand('insertText', false, e.clipboardData.getData('text/plain'));
+  });
+  body.addEventListener('focus', () => body.removeAttribute('aria-live')); // don't read their own typing back
+  body.addEventListener('input', () => {
+    result = readBody();
+    stateLabel.textContent = 'Edited';
+    counts(result);
+  });
+  // Once they're done editing, redraw so paragraphs, hashtags and the fold match the new text.
+  body.addEventListener('blur', () => {
+    body.setAttribute('aria-live', 'polite');
+    if (rewritten && !busy) render(result, false);
+  });
+  body.addEventListener('keydown', e => { if (e.key === 'Escape') body.blur(); });
+
+  // Original / Rewritten, so the visitor can compare without leaving the rewrite.
+  function setView(v) {
+    viewBtns.forEach(b => b.setAttribute('aria-checked', String(b.dataset.view === v)));
+    body.hidden = v !== 'after'; origBody.hidden = v !== 'before'; editHint.hidden = v !== 'after';
+  }
+  viewBtns.forEach(b => b.addEventListener('click', () => setView(b.dataset.view)));
+  viewEl.addEventListener('keydown', e => {
+    if (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') return;
+    const next = viewBtns.find(b => b.getAttribute('aria-checked') !== 'true');
+    setView(next.dataset.view); next.focus(); e.preventDefault();
+  });
 
   function showError(msg) { errorEl.textContent = msg; }
 
   function setRewrittenUI(on) {
     rewritten = on;
-    draft.hidden = on; body.hidden = !on;
+    draft.hidden = on; viewEl.hidden = !on; againBtn.hidden = !on;
+    if (on) setView('after'); else body.hidden = origBody.hidden = editHint.hidden = true;
     btnLabel.textContent = on ? 'Edit draft' : 'Rewrite';
     stateLabel.textContent = on ? 'Rewritten' : 'Your draft';
     stateChip.className = 'chip ' + (on ? 'bg-teal/15 text-teal' : 'bg-white/5 text-mist');
@@ -959,7 +1047,8 @@ Excited for this next chapter and can't wait to see what the future holds!
   }
 
   function setBusy(on) {
-    busy = on; btn.disabled = on; draft.readOnly = on;
+    busy = on; btn.disabled = on; againBtn.disabled = on; draft.readOnly = on;
+    body.contentEditable = on ? 'false' : EDITABLE;
     body.style.transition = 'opacity .25s ease'; body.style.opacity = on ? '.25' : '1';
     if (on) {
       btnLabel.textContent = 'Rewriting…';
@@ -981,13 +1070,14 @@ Excited for this next chapter and can't wait to see what the future holds!
     setRewrittenUI(true);
   }
 
-  async function runRewrite() {
+  // fresh: "New version" skips the cache and asks for something different from what's on screen.
+  async function runRewrite({ fresh = false } = {}) {
     if (busy) return;
     const text = draft.value.trim();
     if (!text) { showError('Paste a draft first.'); draft.focus(); return; }
     showError('');
     const key = `${kind}:${section}\n${tone}\n${text}`;
-    if (cache.has(key)) { show(cache.get(key)); return true; }
+    if (!fresh && cache.has(key)) { show(cache.get(key)); return true; }
 
     setBusy(true);
     let ok = false;
@@ -995,7 +1085,7 @@ Excited for this next chapter and can't wait to see what the future holds!
       const res = await fetch('/api/rewrite', {
         method: 'POST',
         headers: apiHeaders(),
-        body: JSON.stringify({ text, tone, kind, section }),
+        body: JSON.stringify({ text, tone, kind, section, ...(fresh && result ? { previous: result } : {}) }),
         signal: AbortSignal.timeout(45000),
       });
       const data = await res.json().catch(() => ({}));
@@ -1023,6 +1113,8 @@ Excited for this next chapter and can't wait to see what the future holds!
     setRewrittenUI(false);
     if (!isSample(draft.value)) draft.focus(); // focusing would clear the sample they just rewrote
   });
+
+  againBtn.addEventListener('click', () => { if (rewritten) runRewrite({ fresh: true }); });
 
   const tones = [...document.querySelectorAll('#tones .tone')];
   const selectTone = name => { tone = name; tones.forEach(x => x.setAttribute('aria-checked', String(x.dataset.tone === name))); };
@@ -1279,6 +1371,7 @@ Excited for this next chapter and can't wait to see what the future holds!
   // Switching language swaps an untouched sample for the same sample in the other language.
   document.addEventListener('slr:lang', () => {
     if (isSample(draft.value)) { draft.value = L.sample(current().sample); counts(draft.value); }
+    if (rewritten) render(result, false); // the "…see more" label follows the language
   });
 
   // ---------- Examples ----------
